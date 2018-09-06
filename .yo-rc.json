@@ -1,0 +1,11 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "isCreatingSolution": true,
+    "environment": "spo",
+    "version": "1.5.1",
+    "libraryName": "sp-market-place-components",
+    "libraryId": "dc548751-b978-44d3-b1e9-b87a0e5d58b0",
+    "packageManager": "npm",
+    "componentType": "webpart"
+  }
+}

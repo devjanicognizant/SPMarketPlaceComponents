@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "sp-market-place-components-client-side-solution",
+    "id": "dc548751-b978-44d3-b1e9-b87a0e5d58b0",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true
+  },
+  "paths": {
+    "zippedPackage": "solution/sp-market-place-components.sppkg"
+  }
+}
