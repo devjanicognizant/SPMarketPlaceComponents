@@ -21,7 +21,8 @@ export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISp
     const element: React.ReactElement<ISpComponentDetailsProps > = React.createElement(
       SpComponentDetails,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        siteurl: this.context.pageContext.web.absoluteUrl
       }
     );
 
