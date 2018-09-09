@@ -6,7 +6,7 @@ import * as jquery from 'jquery';
 
 export interface ISpComponentDetailsState{ 
   item:{ 
-          "ComponentTitle": "TEST", 
+          "ComponentTitle": "devjani", 
           "ComponentCategory": "", 
           "ComponentDescription":"", 
           "ShortDescription":""
@@ -18,7 +18,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     super(props); 
     this.state = { 
       item:{ 
-        "ComponentTitle": "TEST", 
+        "ComponentTitle": "devjani", 
         "ComponentCategory": "", 
         "ComponentDescription":"", 
         "ShortDescription":""
