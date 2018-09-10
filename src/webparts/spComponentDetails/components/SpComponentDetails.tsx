@@ -14,12 +14,12 @@ export interface ISpComponentDetailsState{
           "DemoUrl":{"Description":"","Url":""},
            "ComponentLimitations":"",
            //"TechnologyStack":[""]
-           "ComponentOwner":{"Title":"","EMail":""}
-          // "ComponentReviewers":"",
-          // "ArtifactsLocation":"",
+           "ComponentOwner":{"Title":"","EMail":""},
+           "ComponentReviewers":[{"Title":"","EMail":""}],
+          "ArtifactsLocation":{"Description":"","Url":""},
           // "ComponentFeatures":"",
           // "DownloadedAssociates":"",
-          // "NoOfDownloads":0
+           "NoOfDownloads":0
         }
 } 
 
@@ -36,13 +36,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DemoUrl":{"Description":"","Url":""},
         "ComponentLimitations":"",
         //"TechnologyStack":[""]
-         "ComponentOwner":{"Title":"","EMail":""}
-        // "ComponentReviewers":"",
+         "ComponentOwner":{"Title":"","EMail":""},
+         "ComponentReviewers":[{"Title":"","EMail":""}],
         
-        // "ArtifactsLocation":"",
+         "ArtifactsLocation":{"Description":"","Url":""},
         // "ComponentFeatures":"",
         // "DownloadedAssociates":"",
-        // "NoOfDownloads":0
+         "NoOfDownloads":0
       }
     };
   } 
@@ -50,12 +50,17 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public componentDidMount(){ 
     var reactHandler = this; 
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)$expand=ComponentOwner&$select=*,ComponentOwner/Title,EMail`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
-        success: function(resultData) {          
+        success: function(resultData) {  
+          var intItem = resultData.d;
+          intItem.ComponentReviewers=[];
+          for(var val in resultData.d.ComponentReviewers)   {
+            intItem.ComponentReviewers.push(val)
+          }
           reactHandler.setState({ 
-            item: resultData.d
+            item: intItem
           }); 
         }, 
         error : function(jqXHR, textStatus, errorThrown) { 
@@ -130,21 +135,28 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             <div className={ styles.column }>
               <p className={ styles.description }>{this.state.item.ComponentOwner.Title}</p>
             </div>
-            {/*
+            <div className={ styles.column }>
+              Artifacts Location
+            </div>
+            <div className={ styles.column }>
+              <p className={ styles.description }>{this.state.item.ArtifactsLocation.Url}</p>
+            </div>
+            <div className={ styles.column }>
+              No Of Downloads
+            </div>
+            <div className={ styles.column }>
+              <p className={ styles.description }>{this.state.item.NoOfDownloads}</p>
+            </div>
+            
             <div className={ styles.column }>
             Component Reviewers
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ComponentReviewers}</p>
+              <p className={ styles.description }>{this.state.item.ComponentReviewers[0].Title}</p>
             </div> 
            
             
-             <div className={ styles.column }>
-              Artifacts Location
-            </div>
-            <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ArtifactsLocation}</p>
-            </div>
+            {/*
             <div className={ styles.column }>
               Component Features
             </div>
@@ -158,12 +170,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             <div className={ styles.column }>
               <p className={ styles.description }>{this.state.item.DownloadedAssociates}</p>
             </div>
-            <div className={ styles.column }>
-              No Of Downloads
-            </div>
-            <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.NoOfDownloads}</p>
-            </div> */}
+             */}
           </div>
         </div>
       </div>
