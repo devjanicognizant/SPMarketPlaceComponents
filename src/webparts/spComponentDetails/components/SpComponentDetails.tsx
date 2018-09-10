@@ -15,7 +15,7 @@ export interface ISpComponentDetailsState{
            "ComponentLimitations":"",
            //"TechnologyStack":[""]
            "ComponentOwner":{"Title":"","EMail":""},
-           "ComponentReviewers":[{"Title":"","EMail":""}],
+           "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
           "ArtifactsLocation":{"Description":"","Url":""},
           // "ComponentFeatures":"",
           // "DownloadedAssociates":"",
@@ -37,7 +37,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentLimitations":"",
         //"TechnologyStack":[""]
          "ComponentOwner":{"Title":"","EMail":""},
-         "ComponentReviewers":[{"Title":"","EMail":""}],
+         "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
         
          "ArtifactsLocation":{"Description":"","Url":""},
         // "ComponentFeatures":"",
@@ -55,10 +55,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
           var intItem = resultData.d;
-          intItem.ComponentReviewers=[];
-          for(var val in resultData.d.ComponentReviewers)   {
-            intItem.ComponentReviewers.push(val)
-          }
+          // intItem.ComponentReviewers=[];
+          // for(var val in resultData.d.ComponentReviewers)   {
+          //   intItem.ComponentReviewers.push(val)
+          // }
           reactHandler.setState({ 
             item: intItem
           }); 
@@ -152,7 +152,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             Component Reviewers
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ComponentReviewers[0].Title}</p>
+              <p className={ styles.description }>{this.state.item.ComponentReviewers.results[0].Title}</p>
             </div> 
            
             
