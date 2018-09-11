@@ -13,12 +13,12 @@ export interface ISpComponentDetailsState{
           "ComponentImage":{"Description":"","Url":""},
           "DemoUrl":{"Description":"","Url":""},
            "ComponentLimitations":"",
-           //"TechnologyStack":[""]
+           "TechnologyStack":{"results":[""]},
            "ComponentOwner":{"Title":"","EMail":""},
            "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
           "ArtifactsLocation":{"Description":"","Url":""},
           // "ComponentFeatures":"",
-          // "DownloadedAssociates":"",
+           "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
            "NoOfDownloads":0
         }
 } 
@@ -35,13 +35,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentImage":{"Description":"","Url":""},
         "DemoUrl":{"Description":"","Url":""},
         "ComponentLimitations":"",
-        //"TechnologyStack":[""]
+        "TechnologyStack":{"results":[""]},
          "ComponentOwner":{"Title":"","EMail":""},
          "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
         
          "ArtifactsLocation":{"Description":"","Url":""},
         // "ComponentFeatures":"",
-        // "DownloadedAssociates":"",
+        "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
          "NoOfDownloads":0
       }
     };
@@ -50,7 +50,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public componentDidMount(){ 
     var reactHandler = this; 
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -123,12 +123,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             <div className={ styles.column }>
               <p className={ styles.description }>{this.state.item.DemoUrl.Url}</p>
             </div>
-            {/* <div className={ styles.column }>
+            <div className={ styles.column }>
              Technology Stack
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.TechnologyStack[0]}</p>
-            </div> */}
+              <p className={ styles.description }>{this.state.item.TechnologyStack.results[0]}</p>
+            </div>
              <div className={ styles.column }>
               Component Owner
             </div>
@@ -154,7 +154,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             <div className={ styles.column }>
               <p className={ styles.description }>{this.state.item.ComponentReviewers.results[0].Title}</p>
             </div> 
-           
+            <div className={ styles.column }>
+              Downloaded Associates
+            </div>
+            <div className={ styles.column }>
+              <p className={ styles.description }>{this.state.item.DownloadedAssociates.results[0].Title}</p>
+            </div>
             
             {/*
             <div className={ styles.column }>
@@ -164,12 +169,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <p className={ styles.description }>{this.state.item.ComponentFeatures}</p>
             </div>
             
-            <div className={ styles.column }>
-              Downloaded Associates
-            </div>
-            <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.DownloadedAssociates}</p>
-            </div>
+            
              */}
           </div>
         </div>
