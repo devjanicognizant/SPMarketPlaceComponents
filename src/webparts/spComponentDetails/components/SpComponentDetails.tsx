@@ -5,6 +5,7 @@ import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 
 export interface ISpComponentDetailsState{ 
+  artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
   item:{ 
           "ComponentTitle": "devjani", 
           "ComponentCategory": "", 
@@ -27,6 +28,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public constructor(props: ISpComponentDetailsProps, state: ISpComponentDetailsState){ 
     super(props); 
     this.state = { 
+      artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
       item:{ 
         "ComponentTitle": "devjani", 
         "ComponentCategory": "", 
@@ -54,18 +56,25 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
-          var intItem = resultData.d;
-          // intItem.ComponentReviewers=[];
-          // for(var val in resultData.d.ComponentReviewers)   {
-          //   intItem.ComponentReviewers.push(val)
-          // }
           reactHandler.setState({ 
-            item: intItem
+            item: resultData.d
           }); 
         }, 
         error : function(jqXHR, textStatus, errorThrown) { 
         } 
     }); 
+    jquery.ajax({ 
+      url: `${this.props.siteurl}/_api/Web/GetFolderByServerRelativeUrl('/sites/spmarketplace/Component%20Artifacts/test')/files`, 
+      type: "GET", 
+      headers:{'Accept': 'application/json; odata=verbose;'}, 
+      success: function(resultData) {  
+        reactHandler.setState({ 
+         artifacts: resultData.d
+        }); 
+      }, 
+      error : function(jqXHR, textStatus, errorThrown) { 
+      } 
+  });
   } 
 
   public render(): React.ReactElement<ISpComponentDetailsProps> {
@@ -172,7 +181,18 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             
             
           </div>
+          <div className={ styles.row }>
+            <div className={ styles.column }>
+              Component Artifacts
+            </div>
+            <div className={ styles.column }>
+              <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Title}</a>
+              {/* <p className={ styles.description }>{this.state.artifacts.results[0].Title}</p> */}
+            </div>
+            </div>
         </div>
+        
+                     
       </div>
     );
   }
