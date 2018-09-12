@@ -17,7 +17,7 @@ export interface ISpComponentDetailsState{
            "ComponentOwner":{"Title":"","EMail":""},
            "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
           "ArtifactsLocation":{"Description":"","Url":""},
-          // "ComponentFeatures":"",
+          "ComponentFeatures":{"results":[{"Title":""}]},
            "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
            "NoOfDownloads":0
         }
@@ -40,7 +40,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
          "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
         
          "ArtifactsLocation":{"Description":"","Url":""},
-        // "ComponentFeatures":"",
+         "ComponentFeatures":{"results":[{"Title":""}]},
         "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
          "NoOfDownloads":0
       }
@@ -50,7 +50,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public componentDidMount(){ 
     var reactHandler = this; 
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -161,16 +161,16 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <p className={ styles.description }>{this.state.item.DownloadedAssociates.results[0].Title}</p>
             </div>
             
-            {/*
+            
             <div className={ styles.column }>
               Component Features
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ComponentFeatures}</p>
+              <p className={ styles.description }>{this.state.item.ComponentFeatures.results[0].Title}</p>
             </div>
             
             
-             */}
+            
           </div>
         </div>
       </div>
