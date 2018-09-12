@@ -3,10 +3,6 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
-import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
-import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
-import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
-import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
 
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
