@@ -3,6 +3,10 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
+import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
+import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
+import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
+import { PlaceholderContent } from '../../../../node_modules/@microsoft/sp-application-base';
 
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
@@ -51,30 +55,34 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
 
   public componentDidMount(){ 
     var reactHandler = this; 
+    var siteUrl = this.props.siteurl;
+     let id: string = window.location.search.split("id=")[1];
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(1)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack, ComponentFeatures/Title`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
           reactHandler.setState({ 
             item: resultData.d
           }); 
+          var artifactLocationRelativeUrl = resultData.d.ArtifactsLocation.Url.replace("https://cosmo2013.sharepoint.com","");
+          jquery.ajax({ 
+            url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
+            type: "GET", 
+            headers:{'Accept': 'application/json; odata=verbose;'}, 
+            success: function(resultData) {  
+              reactHandler.setState({ 
+               artifacts: resultData.d
+              }); 
+            }, 
+            error : function(jqXHR, textStatus, errorThrown) { 
+            } 
+        });
         }, 
         error : function(jqXHR, textStatus, errorThrown) { 
         } 
     }); 
-    jquery.ajax({ 
-      url: `${this.props.siteurl}/_api/Web/GetFolderByServerRelativeUrl('/sites/spmarketplace/Component%20Artifacts/test')/files`, 
-      type: "GET", 
-      headers:{'Accept': 'application/json; odata=verbose;'}, 
-      success: function(resultData) {  
-        reactHandler.setState({ 
-         artifacts: resultData.d
-        }); 
-      }, 
-      error : function(jqXHR, textStatus, errorThrown) { 
-      } 
-  });
+   
   } 
 
   public render(): React.ReactElement<ISpComponentDetailsProps> {
@@ -102,10 +110,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <p className={ styles.description }>{escape(this.state.item.ComponentCategory)}</p>
             </div>
             <div className={ styles.column }>
-              Component Description
+            Component Description
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ComponentDescription}</p>
+              {this.state.item.ComponentDescription}
             </div>
             <div className={ styles.column }>
               Short Description
@@ -117,7 +125,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               Component Image
             </div>
             <div className={ styles.column }>
-              <p className={ styles.description }>{this.state.item.ComponentImage.Url}</p>
+              <img src={this.state.item.ComponentImage.Url} alt=""></img>
             </div>
             
             <div className={ styles.column }>
