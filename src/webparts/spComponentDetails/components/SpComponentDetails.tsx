@@ -10,6 +10,7 @@ export interface ISpComponentDetailsState{
           "ComponentTitle": "devjani", 
           "ComponentCategory": "", 
           "ComponentDescription":"", 
+          "ComponentDescriptionContent":{ __html: "" },
           "ShortDescription":"",
           "ComponentImage":{"Description":"","Url":""},
           "DemoUrl":{"Description":"","Url":""},
@@ -33,6 +34,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentTitle": "devjani", 
         "ComponentCategory": "", 
         "ComponentDescription":"", 
+        "ComponentDescriptionContent":{ __html: "" },
         "ShortDescription":"",
         "ComponentImage":{"Description":"","Url":""},
         "DemoUrl":{"Description":"","Url":""},
@@ -58,8 +60,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
+          resultData.d.ComponentDescriptionContent = { __html: resultData.d.ComponentDescription };
           reactHandler.setState({ 
             item: resultData.d
+            
           }); 
           var artifactLocationRelativeUrl = resultData.d.ArtifactsLocation.Url.replace("https://cosmo2013.sharepoint.com","");
           jquery.ajax({ 
@@ -109,7 +113,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             Component Description
             </div>
             <div className={ styles.column }>
-              {this.state.item.ComponentDescription}
+              <div contentEditable={true} dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></div>
             </div>
             <div className={ styles.column }>
               Short Description
