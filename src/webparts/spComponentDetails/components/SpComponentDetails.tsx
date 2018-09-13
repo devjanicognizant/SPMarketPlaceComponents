@@ -3,9 +3,10 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
+import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
-  artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
+  artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
   item:{ 
           "ComponentTitle": "devjani", 
           "ComponentCategory": "", 
@@ -29,7 +30,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public constructor(props: ISpComponentDetailsProps, state: ISpComponentDetailsState){ 
     super(props); 
     this.state = { 
-      artifacts:{results:[{"Title":"","ServerRelativeUrl":""}]},
+      artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
       item:{ 
         "ComponentTitle": "devjani", 
         "ComponentCategory": "", 
@@ -91,18 +92,32 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         <div className={ styles.container }>
           <div className={ styles.row }>
             <div className={ styles.column }>
-              Component Title
+              <span className={ styles.title }>{escape(this.state.item.ComponentTitle)}</span>
+              <p className={ styles.subTitle }>{escape(this.state.item.ShortDescription)}</p>
+              <p className={ styles.description } dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
+              <div>
+                <img src={this.state.item.ComponentImage.Url} alt=""></img>
+              </div>
             </div>
-            <div className={ styles.column }>
-              {/* <span className={ styles.title }>Welcome to SharePoint!</span>
-              <p className={ styles.subTitle }>Customize SharePoint experiences using Web Parts.</p>
-              <p className={ styles.description }>{escape(this.props.description)}</p>
-              <a href="https://aka.ms/spfx" className={ styles.button }>
-                <span className={ styles.label }>Learn more..test Git..Devjani</span>
-              </a>
-              <p className={ styles.description }>{escape(this.props.siteurl)}</p> */}
-              <p className={ styles.description }>{escape(this.state.item.ComponentTitle)}</p>
-            </div>
+            
+          </div>
+          <Column flexGrow={1}>
+            <Row horizontal='center'>
+                <h1>HEADER</h1>
+            </Row>
+            <Row vertical='center'>
+                <Column flexGrow={1} horizontal='center'>
+                    <h3> Column 1 </h3>
+                    <span> column 1 content </span>
+                </Column>
+                <Column flexGrow={1} horizontal='center'>
+                    <h3> Column 2 </h3>
+                    <span> column 2 content </span>
+                </Column>
+            </Row>
+          </Column>
+          {/* <div className={ styles.row }>
+            
             <div className={ styles.column }>
               Component Category
             </div>
@@ -188,14 +203,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             
             
             
-          </div>
+          </div> */}
           <div className={ styles.row }>
             <div className={ styles.column }>
               Component Artifacts
             </div>
             <div className={ styles.column }>
-              <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Title}</a>
-              {/* <p className={ styles.description }>{this.state.artifacts.results[0].Title}</p> */}
+              <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Name}</a>
             </div>
             </div>
         </div>
