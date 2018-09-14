@@ -8,7 +8,7 @@ import { Column, Row } from 'simple-flexbox';
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
   item:{ 
-          "ComponentTitle": "devjani", 
+          "ComponentTitle": "", 
           "ComponentCategory": "", 
           "ComponentDescription":"", 
           "ComponentDescriptionContent":{ __html: "" },
@@ -32,7 +32,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     this.state = { 
       artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
       item:{ 
-        "ComponentTitle": "devjani", 
+        "ComponentTitle": "", 
         "ComponentCategory": "", 
         "ComponentDescription":"", 
         "ComponentDescriptionContent":{ __html: "" },
@@ -55,7 +55,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public componentDidMount(){ 
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
-     let id: string = window.location.search.split("id=")[1];
+     let id: string = window.location.search.split("ComponentID=")[1];
     jquery.ajax({ 
         url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
@@ -89,8 +89,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={ styles.spComponentDetails }>
-        <div className={ styles.container }>
-          <div className={ styles.row }>
+        {/* <div className={ styles.container }> */}
+          {/* <div className={ styles.row }>
             <div className={ styles.column }>
               <span className={ styles.title }>{escape(this.state.item.ComponentTitle)}</span>
               <p className={ styles.subTitle }>{escape(this.state.item.ShortDescription)}</p>
@@ -99,20 +99,35 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 <img src={this.state.item.ComponentImage.Url} alt=""></img>
               </div>
             </div>
-            
-          </div>
+          </div> */}
           <Column flexGrow={1}>
-            <Row horizontal='center'>
-                <h1>HEADER</h1>
-            </Row>
-            <Row vertical='center'>
-                <Column flexGrow={1} horizontal='center'>
-                    <h3> Column 1 </h3>
-                    <span> column 1 content </span>
+            {/* <Row horizontal='center'>
+                <h1>{escape(this.state.item.ComponentTitle)}</h1>
+            </Row> */}
+            <Row vertical='top'>
+                <Column flexGrow={1} className={styles.width50}>
+                  <h1>{escape(this.state.item.ComponentTitle)}</h1>
+                  <p>{escape(this.state.item.ShortDescription)}</p>
+                  <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
+                  <div>
+                    <img src={this.state.item.ComponentImage.Url} alt=""></img>
+                  </div>
                 </Column>
-                <Column flexGrow={1} horizontal='center'>
-                    <h3> Column 2 </h3>
-                    <span> column 2 content </span>
+                <Column flexGrow={1} className={styles.width10}>
+                </Column>
+                <Column flexGrow={1} className={styles.width40}>
+                  <br />
+                  <h3><a href="www.google.com">View Demo</a></h3>
+                  <h2>
+                    Additional Resources
+                  </h2>
+                  <div>
+                    {this.state.artifacts.results.map(function(d, idx){
+                      return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
+                    })}
+                    {/* <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Name}</a> */}
+                  </div>
+                  <h3><a href="www.google.com">Contact Component Owner</a></h3>
                 </Column>
             </Row>
           </Column>
@@ -204,15 +219,15 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             
             
           </div> */}
-          <div className={ styles.row }>
+          {/* <div className={ styles.row }>
             <div className={ styles.column }>
               Component Artifacts
             </div>
             <div className={ styles.column }>
               <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Name}</a>
             </div>
-            </div>
-        </div>
+            </div> */}
+        {/* </div> */}
         
                      
       </div>

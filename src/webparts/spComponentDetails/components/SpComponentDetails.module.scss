@@ -13,6 +13,21 @@
     background-color: $ms-color-themeDark;
     padding: 20px;
   }
+  .hide{
+    display:none;
+  }
+  .width50{
+    width:50%;
+  }
+  .width60{
+    width:60%;
+  }
+  .width40{
+    width:40%;
+  }
+  .width10{
+    width:10%;
+  }
 
   .column {
     @include ms-Grid-col;
