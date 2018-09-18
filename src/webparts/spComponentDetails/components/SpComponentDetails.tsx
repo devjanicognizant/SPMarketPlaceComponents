@@ -3,6 +3,7 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
+declare var $;
 import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
@@ -17,11 +18,11 @@ export interface ISpComponentDetailsState{
           "DemoUrl":{"Description":"","Url":""},
            "ComponentLimitations":"",
            "TechnologyStack":{"results":[""]},
-           "ComponentOwner":{"Title":"","EMail":""},
-           "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
+           "ComponentOwner":{"Title":"","UserName":""},
+           "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
           "ArtifactsLocation":{"Description":"","Url":""},
           "ComponentFeatures":{"results":[{"Title":""}]},
-           "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
+           "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
            "NoOfDownloads":0
         }
 } 
@@ -41,23 +42,25 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DemoUrl":{"Description":"","Url":""},
         "ComponentLimitations":"",
         "TechnologyStack":{"results":[""]},
-         "ComponentOwner":{"Title":"","EMail":""},
-         "ComponentReviewers":{"results":[{"Title":"","EMail":""}]},
+         "ComponentOwner":{"Title":"","UserName":""},
+         "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
         
          "ArtifactsLocation":{"Description":"","Url":""},
          "ComponentFeatures":{"results":[{"Title":""}]},
-        "DownloadedAssociates":{"results":[{"Title":"","EMail":""}]},
+        "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
          "NoOfDownloads":0
       }
     };
   } 
 
   public componentDidMount(){ 
+    jquery("div[class^='pageTitle_']").hide();
+    jquery("div[class^='footerBar_']").hide();
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
      let id: string = window.location.search.split("ComponentID=")[1];
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title, DownloadedAssociates/Title, TechnologyStack, ComponentFeatures/Title`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -89,48 +92,52 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={ styles.spComponentDetails }>
-        {/* <div className={ styles.container }> */}
-          {/* <div className={ styles.row }>
-            <div className={ styles.column }>
-              <span className={ styles.title }>{escape(this.state.item.ComponentTitle)}</span>
-              <p className={ styles.subTitle }>{escape(this.state.item.ShortDescription)}</p>
-              <p className={ styles.description } dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
-              <div>
-                <img src={this.state.item.ComponentImage.Url} alt=""></img>
-              </div>
-            </div>
-          </div> */}
-          <Column flexGrow={1}>
-            {/* <Row horizontal='center'>
-                <h1>{escape(this.state.item.ComponentTitle)}</h1>
-            </Row> */}
-            <Row vertical='top'>
-                <Column flexGrow={1} className={styles.width50}>
-                  <h1>{escape(this.state.item.ComponentTitle)}</h1>
-                  <p>{escape(this.state.item.ShortDescription)}</p>
-                  <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
-                  <div>
+          <Row vertical='top'> 
+              <Column flexGrow={1} className={styles.width50}>
+                <div>
+                  <div id="divComponentTitle">
+                    <h1>{escape(this.state.item.ComponentTitle)}</h1>
+                  </div>
+                  <br />
+                  <div id="divShortDescription">
+                    <p>{escape(this.state.item.ShortDescription)}</p>
+                  </div>
+                  <br/>
+                  <div id="divComponentDescriptionContent">
+                    <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
+                  </div>
+                  <div id="divComponentImage">
                     <img src={this.state.item.ComponentImage.Url} alt=""></img>
                   </div>
-                </Column>
-                <Column flexGrow={1} className={styles.width10}>
-                </Column>
-                <Column flexGrow={1} className={styles.width40}>
+                </div>
+              </Column>
+              <Column flexGrow={1} className={styles.width10}>
+              </Column>
+              <Column flexGrow={1} className={styles.width40}>
+                <div>
                   <br />
-                  <h3><a href="www.google.com">View Demo</a></h3>
-                  <h2>
-                    Additional Resources
-                  </h2>
-                  <div>
+                  <div id="divDemoUrl">
+                    {/* <h3><a href={this.state.item.DemoUrl.Url}>View Demo</a></h3> */}
+                    <h3><a href="" className={styles.button}>View Demo</a></h3>
+                  </div>
+                  <br />
+                  <div id="dicAdditionalResourcesHeader">
+                    <h2>
+                      Additional Resources
+                    </h2>
+                  </div>
+                  <div id="divAdditionalResources">
                     {this.state.artifacts.results.map(function(d, idx){
                       return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
                     })}
-                    {/* <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Name}</a> */}
                   </div>
-                  <h3><a href="www.google.com">Contact Component Owner</a></h3>
-                </Column>
-            </Row>
-          </Column>
+                  <br/>
+                  <div id="divComponentOwner">
+                    <h3><a href={'mailto:'+this.state.item.ComponentOwner.UserName} className={styles.button}>Contact Component Owner</a></h3>
+                  </div>
+                </div>
+              </Column>
+          </Row>
           {/* <div className={ styles.row }>
             
             <div className={ styles.column }>
@@ -218,18 +225,16 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             
             
             
-          </div> */}
-          {/* <div className={ styles.row }>
+          </div> 
+           <div className={ styles.row }>
             <div className={ styles.column }>
               Component Artifacts
             </div>
             <div className={ styles.column }>
               <a href={this.state.artifacts.results[0].ServerRelativeUrl}>{this.state.artifacts.results[0].Name}</a>
             </div>
-            </div> */}
-        {/* </div> */}
-        
-                     
+            </div> 
+        </div> */}
       </div>
     );
   }
