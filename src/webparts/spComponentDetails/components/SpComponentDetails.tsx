@@ -3,7 +3,6 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
-declare var $;
 import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
@@ -16,14 +15,14 @@ export interface ISpComponentDetailsState{
           "ShortDescription":"",
           "ComponentImage":{"Description":"","Url":""},
           "DemoUrl":{"Description":"","Url":""},
-           "ComponentLimitations":"",
-           "TechnologyStack":{"results":[""]},
-           "ComponentOwner":{"Title":"","UserName":""},
-           "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
+          "ComponentLimitations":"",
+          "TechnologyStack":{"results":[""]},
+          "ComponentOwner":{"Title":"","UserName":""},
+          "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
           "ArtifactsLocation":{"Description":"","Url":""},
           "ComponentFeatures":{"results":[{"Title":""}]},
-           "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-           "NoOfDownloads":0
+          "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
+          "NoOfDownloads":0
         }
 } 
 
@@ -42,13 +41,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DemoUrl":{"Description":"","Url":""},
         "ComponentLimitations":"",
         "TechnologyStack":{"results":[""]},
-         "ComponentOwner":{"Title":"","UserName":""},
-         "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
+        "ComponentOwner":{"Title":"","UserName":""},
+        "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
         
-         "ArtifactsLocation":{"Description":"","Url":""},
-         "ComponentFeatures":{"results":[{"Title":""}]},
+        "ArtifactsLocation":{"Description":"","Url":""},
+        "ComponentFeatures":{"results":[{"Title":""}]},
         "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-         "NoOfDownloads":0
+        "NoOfDownloads":0
       }
     };
   } 
@@ -58,7 +57,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     jquery("div[class^='footerBar_']").hide();
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
-     let id: string = window.location.search.split("ComponentID=")[1];
+    let id: string = window.location.search.split("ComponentID=")[1];
     jquery.ajax({ 
         url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
@@ -67,23 +66,42 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           resultData.d.ComponentDescriptionContent = { __html: resultData.d.ComponentDescription };
           reactHandler.setState({ 
             item: resultData.d
-            
           }); 
-          var artifactLocationRelativeUrl = resultData.d.ArtifactsLocation.Url.replace("https://cosmo2013.sharepoint.com","");
           jquery.ajax({ 
-            url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
+            url: siteUrl+ "/_api/web/lists/getbytitle('Component%20Artifacts')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+id+"%27", 
             type: "GET", 
             headers:{'Accept': 'application/json; odata=verbose;'}, 
             success: function(resultData) {  
-              reactHandler.setState({ 
-               artifacts: resultData.d
-              }); 
+              if(resultData.d.results)
+              {
+                var artifactLocationRelativeUrl = resultData.d.results[0].Folder.ServerRelativeUrl;
+                jquery.ajax({ 
+                  url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
+                  type: "GET", 
+                  headers:{'Accept': 'application/json; odata=verbose;'}, 
+                  success: function(resultData) {  
+                    reactHandler.setState({ 
+                     artifacts: resultData.d
+                    }); 
+                  }, 
+                  error : function(jqXHR, textStatus, errorThrown) { 
+                    console.log('Error occured while fetching component artifact files from document set');
+                    console.log(errorThrown);
+                  } 
+                });
+              }
             }, 
             error : function(jqXHR, textStatus, errorThrown) { 
+              console.log('Error occured while fetching component artifact document set');
+              console.log(errorThrown);
             } 
-        });
+          });
+
+          
         }, 
         error : function(jqXHR, textStatus, errorThrown) { 
+          console.log('Error occured while fetching component item details');
+          console.log(errorThrown);
         } 
     }); 
    
