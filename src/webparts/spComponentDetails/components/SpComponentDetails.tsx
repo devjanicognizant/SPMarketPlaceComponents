@@ -57,7 +57,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     jquery("div[class^='footerBar_']").hide();
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
+    // Get component id from query string
     let id: string = window.location.search.split("ComponentID=")[1];
+    // Get component details by id
     jquery.ajax({ 
         url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title`, 
         type: "GET", 
@@ -67,13 +69,15 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           reactHandler.setState({ 
             item: resultData.d
           }); 
+          // Get artifact document set for the component
           jquery.ajax({ 
             url: siteUrl+ "/_api/web/lists/getbytitle('Component%20Artifacts')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+id+"%27", 
             type: "GET", 
             headers:{'Accept': 'application/json; odata=verbose;'}, 
             success: function(resultData) {  
-              if(resultData.d.results)
+              if(resultData.d.results.length>0)
               {
+                // Get artifact files from the document set
                 var artifactLocationRelativeUrl = resultData.d.results[0].Folder.ServerRelativeUrl;
                 jquery.ajax({ 
                   url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
@@ -90,6 +94,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   } 
                 });
               }
+              
             }, 
             error : function(jqXHR, textStatus, errorThrown) { 
               console.log('Error occured while fetching component artifact document set');
