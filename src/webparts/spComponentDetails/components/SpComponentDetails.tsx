@@ -6,7 +6,7 @@ import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
-  artifacts:{results:[{"Name":"None","ServerRelativeUrl":"javascript:"}]},
+  artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]},
   item:{ 
           "ComponentTitle": "", 
           "ComponentCategory": "", 
@@ -31,7 +31,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public constructor(props: ISpComponentDetailsProps, state: ISpComponentDetailsState){ 
     super(props); 
     this.state = { 
-      artifacts:{results:[{"Name":"None","ServerRelativeUrl":"javascript:"}]},
+      artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]},
       item:{ 
         "ComponentTitle": "", 
         "ComponentCategory": "", 
@@ -156,8 +156,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <br />
                   <div id="divDemoUrl">
                     {this.renderDemoLink()}
-                    {/* <h3><a href={this.state.item.DemoUrl.Url}>View Demo</a></h3> */}
-                    
+                                        
                   </div>
                   <br />
                   <div id="dicAdditionalResourcesHeader">
@@ -166,9 +165,11 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     </h2>
                   </div>
                   <div id="divAdditionalResources">
-                    {this.state.artifacts.results.map(function(d, idx){
-                      return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
-                    })}
+                    <ul>
+                      {this.state.artifacts.results.map(function(d, idx){
+                        return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
+                      })}
+                    </ul>
                   </div>
                   <br/>
                   <div id="divComponentOwner">
