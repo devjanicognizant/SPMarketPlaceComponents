@@ -1,7 +1,8 @@
 declare interface ISpComponentDetailsWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
-  DescriptionFieldLabel: string;
+  InventoryListNameFieldLabel: string;
+  ArtifactsListNameFieldLabel: string;
 }
 
 declare module 'SpComponentDetailsWebPartStrings' {

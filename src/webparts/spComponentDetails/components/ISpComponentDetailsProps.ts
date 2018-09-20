@@ -1,4 +1,5 @@
 export interface ISpComponentDetailsProps {
-  description: string;
+  inventoryListName: string;
+  artifactsListName: string;
   siteurl: string;
 }

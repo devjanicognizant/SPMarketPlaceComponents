@@ -12,7 +12,8 @@ import SpComponentDetails from './components/SpComponentDetails';
 import { ISpComponentDetailsProps } from './components/ISpComponentDetailsProps';
 
 export interface ISpComponentDetailsWebPartProps {
-  description: string;
+  inventoryListName:string;
+  artifactsListName:string;
 }
 
 export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISpComponentDetailsWebPartProps> {
@@ -21,7 +22,8 @@ export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISp
     const element: React.ReactElement<ISpComponentDetailsProps > = React.createElement(
       SpComponentDetails,
       {
-        description: this.properties.description,
+        inventoryListName: this.properties.inventoryListName,
+        artifactsListName: this.properties.artifactsListName,
         siteurl: this.context.pageContext.web.absoluteUrl
       }
     );
@@ -48,8 +50,11 @@ export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISp
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+               PropertyPaneTextField('inventoryListName', {
+                  label: strings.InventoryListNameFieldLabel
+                }),
+                PropertyPaneTextField('artifactsListName', {
+                  label: strings.ArtifactsListNameFieldLabel
                 })
               ]
             }

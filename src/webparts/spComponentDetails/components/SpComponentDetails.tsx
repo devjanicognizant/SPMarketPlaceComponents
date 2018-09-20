@@ -6,7 +6,7 @@ import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
-  artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]},
+  artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]};
   item:{ 
           "ComponentTitle": "", 
           "ComponentCategory": "", 
@@ -24,7 +24,7 @@ export interface ISpComponentDetailsState{
           "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
           "NoOfDownloads":0,
           "FavouriteAssociatesId":""
-        }
+        };
 } 
 
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -59,11 +59,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     jquery("div[class^='footerBar_']").hide();
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
+    var artifactListName = this.props.artifactsListName;
     // Get component id from query string
     let id: string = window.location.search.split("ComponentID=")[1];
     // Get component details by id
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -73,7 +74,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           }); 
           // Get artifact document set for the component
           jquery.ajax({ 
-            url: siteUrl+ "/_api/web/lists/getbytitle('Component%20Artifacts')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+id+"%27", 
+            url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+id+"%27", 
             type: "GET", 
             headers:{'Accept': 'application/json; odata=verbose;'}, 
             success: function(resultData) {  
@@ -92,7 +93,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   }, 
                   error : function(jqXHR, textStatus, errorThrown) { 
                     console.log('Error occured while fetching component artifact files from document set');
-                    console.log(errorThrown);
+                    console.log(jqXHR.responseText);
                   } 
                 });
               }
@@ -100,7 +101,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             }, 
             error : function(jqXHR, textStatus, errorThrown) { 
               console.log('Error occured while fetching component artifact document set');
-              console.log(errorThrown);
+              console.log(jqXHR.responseText);
             } 
           });
 
@@ -108,13 +109,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         }, 
         error : function(jqXHR, textStatus, errorThrown) { 
           console.log('Error occured while fetching component item details');
-          console.log(errorThrown);
+          console.log(jqXHR.responseText);
         } 
     }); 
    
   } 
 
-  renderDemoLink(){
+  private renderDemoLink(){
     if(this.state.item.DemoUrl != null)
       {
         return(
@@ -167,7 +168,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <div id="divAdditionalResources">
                     <ul>
                       {this.state.artifacts.results.map(function(d, idx){
-                        return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
+                        return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>);
                       })}
                     </ul>
                   </div>

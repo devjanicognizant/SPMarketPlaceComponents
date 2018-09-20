@@ -14,13 +14,14 @@
   "requiresCustomScript": false,
 
   "preconfiguredEntries": [{
-    "groupId": "5c03119e-3074-46fd-976b-c60198311f70", // Other
-    "group": { "default": "Other" },
-    "title": { "default": "SPComponentDetails" },
+    "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+    "group": { "default": "MarketPlace" },
+    "title": { "default": "Component Details" },
     "description": { "default": "Detail page of a marketplace component" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "description": "SPComponentDetails"
+      "inventoryListName": "Component Inventory",
+      "artifactsListName": "Component Artifacts"
     }
   }]
 }
