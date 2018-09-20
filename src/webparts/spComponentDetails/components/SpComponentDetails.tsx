@@ -6,7 +6,7 @@ import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 
 export interface ISpComponentDetailsState{ 
-  artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
+  artifacts:{results:[{"Name":"None","ServerRelativeUrl":"javascript:"}]},
   item:{ 
           "ComponentTitle": "", 
           "ComponentCategory": "", 
@@ -22,7 +22,8 @@ export interface ISpComponentDetailsState{
           "ArtifactsLocation":{"Description":"","Url":""},
           "ComponentFeatures":{"results":[{"Title":""}]},
           "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-          "NoOfDownloads":0
+          "NoOfDownloads":0,
+          "FavouriteAssociatesId":""
         }
 } 
 
@@ -30,7 +31,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public constructor(props: ISpComponentDetailsProps, state: ISpComponentDetailsState){ 
     super(props); 
     this.state = { 
-      artifacts:{results:[{"Name":"","ServerRelativeUrl":""}]},
+      artifacts:{results:[{"Name":"None","ServerRelativeUrl":"javascript:"}]},
       item:{ 
         "ComponentTitle": "", 
         "ComponentCategory": "", 
@@ -47,7 +48,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ArtifactsLocation":{"Description":"","Url":""},
         "ComponentFeatures":{"results":[{"Title":""}]},
         "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-        "NoOfDownloads":0
+        "NoOfDownloads":0,
+        "FavouriteAssociatesId":""
       }
     };
   } 
@@ -61,7 +63,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     let id: string = window.location.search.split("ComponentID=")[1];
     // Get component details by id
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Component Inventory')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -112,6 +114,21 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
    
   } 
 
+  renderDemoLink(){
+    if(this.state.item.DemoUrl != null)
+      {
+        return(
+          <h3><a href={this.state.item.DemoUrl.Url}>View Demo</a></h3>
+        );
+      }
+      else
+      {
+        return(
+          <h3>No Demo available</h3>
+        );
+      }
+  }
+
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={ styles.spComponentDetails }>
@@ -121,11 +138,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <div id="divComponentTitle">
                     <h1>{escape(this.state.item.ComponentTitle)}</h1>
                   </div>
-                  <br />
                   <div id="divShortDescription">
                     <p>{escape(this.state.item.ShortDescription)}</p>
                   </div>
-                  <br/>
                   <div id="divComponentDescriptionContent">
                     <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
                   </div>
@@ -140,8 +155,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 <div>
                   <br />
                   <div id="divDemoUrl">
+                    {this.renderDemoLink()}
                     {/* <h3><a href={this.state.item.DemoUrl.Url}>View Demo</a></h3> */}
-                    <h3><a href="" className={styles.button}>View Demo</a></h3>
+                    
                   </div>
                   <br />
                   <div id="dicAdditionalResourcesHeader">
@@ -158,6 +174,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <div id="divComponentOwner">
                     <h3><a href={'mailto:'+this.state.item.ComponentOwner.UserName} className={styles.button}>Contact Component Owner</a></h3>
                   </div>
+                </div>
+                <br/>
+                <div id="divFav">
+                  <a href={"javascript:CognizantCDBMP.addToFavorite(6, 'imgFav');"}>
+                    <img id="imgFav" 
+                      src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
+                  </a>   
                 </div>
               </Column>
           </Row>
