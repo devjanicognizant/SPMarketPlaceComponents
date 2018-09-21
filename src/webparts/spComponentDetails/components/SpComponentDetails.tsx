@@ -130,6 +130,22 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       }
   }
 
+  private _externalJsUrl: string = "https://cosmo2013.sharepoint.com/sites/SPMarketPlace/Style%20Library/MarketPlace/Tiles.js";
+ 
+  
+  public onInit(): Promise<void> {
+    console.log(`ComponentDetails.onInit(): Entered.`);
+    
+    let scriptTag: HTMLScriptElement = document.createElement("script");
+    scriptTag.src = this._externalJsUrl;
+    scriptTag.type = "text/javascript";
+    document.getElementsByTagName("head")[0].appendChild(scriptTag);
+ 
+    console.log(`ComponentDetails.onInit(): Added script link.`);
+    console.log(`ComponentDetailsx.onInit(): Leaving.`);
+    return Promise.resolve<void>();
+  }
+
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={ styles.spComponentDetails }>
