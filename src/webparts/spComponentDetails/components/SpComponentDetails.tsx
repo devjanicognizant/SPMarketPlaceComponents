@@ -4,6 +4,7 @@ import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
+import pnp from 'sp-pnp-js'
 
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]};
@@ -22,8 +23,8 @@ export interface ISpComponentDetailsState{
           "ArtifactsLocation":{"Description":"","Url":""},
           "ComponentFeatures":{"results":[{"Title":""}]},
           "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-          "NoOfDownloads":0,
-          "FavouriteAssociatesId":""
+          "NoOfDownloads":"0",
+          "FavouriteAssociatesId":{"results":number[]}
         };
 } 
 
@@ -48,23 +49,21 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ArtifactsLocation":{"Description":"","Url":""},
         "ComponentFeatures":{"results":[{"Title":""}]},
         "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-        "NoOfDownloads":0,
-        "FavouriteAssociatesId":""
+        "NoOfDownloads":"0",
+        "FavouriteAssociatesId":{"results":[0]}
       }
     };
   } 
-
-  public componentDidMount(){ 
-    jquery("div[class^='pageTitle_']").hide();
-    jquery("div[class^='footerBar_']").hide();
+  private id: string;
+  public componentDidMount(){
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
     var artifactListName = this.props.artifactsListName;
     // Get component id from query string
-    let id: string = window.location.search.split("ComponentID=")[1];
+    this.id = window.location.search.split("ComponentID=")[1];
     // Get component details by id
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+this.id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -74,7 +73,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           }); 
           // Get artifact document set for the component
           jquery.ajax({ 
-            url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+id+"%27", 
+            url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+this.id+"%27", 
             type: "GET", 
             headers:{'Accept': 'application/json; odata=verbose;'}, 
             success: function(resultData) {  
@@ -130,21 +129,49 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       }
   }
 
-  private _externalJsUrl: string = "https://cosmo2013.sharepoint.com/sites/SPMarketPlace/Style%20Library/MarketPlace/Tiles.js";
+  
+
+  
+  public  getUserId(email:string):number{
+    let id:number = 0;
+    //var email=this.context.pageContext.user.email;
+    pnp.sp.site.rootWeb.ensureUser(email).then(result => {
+      id = result.data.Id;
+    })
+    return id;
+  }
+  private renderFavouriteImage(){
+    if(this.state.item.FavouriteAssociatesId.results.indexOf(15) != -1){
+      return(
+        <img id="imgFav" 
+          src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
+      )
+    }
+    else{
+      return(
+      <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
+        <img id="imgFav" 
+          src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
+      </a>
+      );
+    }
+  }
+
+  // private _externalJsUrl: string = "https://cosmo2013.sharepoint.com/sites/SPMarketPlace/Style%20Library/MarketPlace/Tiles.js";
  
   
-  public onInit(): Promise<void> {
-    console.log(`ComponentDetails.onInit(): Entered.`);
+  // public onInit(): Promise<void> {
+  //   console.log(`ComponentDetails.onInit(): Entered.`);
     
-    let scriptTag: HTMLScriptElement = document.createElement("script");
-    scriptTag.src = this._externalJsUrl;
-    scriptTag.type = "text/javascript";
-    document.getElementsByTagName("head")[0].appendChild(scriptTag);
+  //   let scriptTag: HTMLScriptElement = document.createElement("script");
+  //   scriptTag.src = this._externalJsUrl;
+  //   scriptTag.type = "text/javascript";
+  //   document.getElementsByTagName("head")[0].appendChild(scriptTag);
  
-    console.log(`ComponentDetails.onInit(): Added script link.`);
-    console.log(`ComponentDetailsx.onInit(): Leaving.`);
-    return Promise.resolve<void>();
-  }
+  //   console.log(`ComponentDetails.onInit(): Added script link.`);
+  //   console.log(`ComponentDetailsx.onInit(): Leaving.`);
+  //   return Promise.resolve<void>();
+  // }
 
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
@@ -195,10 +222,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 </div>
                 <br/>
                 <div id="divFav">
-                  <a href={"javascript:CognizantCDBMP.addToFavorite(6, 'imgFav');"}>
-                    <img id="imgFav" 
-                      src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
-                  </a>   
+                   {this.renderFavouriteImage()} 
                 </div>
               </Column>
           </Row>
