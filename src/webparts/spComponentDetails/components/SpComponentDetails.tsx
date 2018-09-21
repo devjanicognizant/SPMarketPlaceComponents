@@ -9,23 +9,31 @@ import pnp from 'sp-pnp-js'
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]};
   item:{ 
-          "ComponentTitle": "", 
-          "ComponentCategory": "", 
-          "ComponentDescription":"", 
-          "ComponentDescriptionContent":{ __html: "" },
-          "ShortDescription":"",
-          "ComponentImage":{"Description":"","Url":""},
-          "DemoUrl":{"Description":"","Url":""},
-          "ComponentLimitations":"",
-          "TechnologyStack":{"results":[""]},
-          "ComponentOwner":{"Title":"","UserName":""},
-          "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
-          "ArtifactsLocation":{"Description":"","Url":""},
-          "ComponentFeatures":{"results":[{"Title":""}]},
-          "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
-          "NoOfDownloads":"0",
-          "FavouriteAssociatesId":{"results":number[]}
-        };
+      "ComponentTitle": "", 
+      "ComponentCategory": "", 
+      "ComponentDescription":"", 
+      "ComponentDescriptionContent":{ __html: "" },
+      "ShortDescription":"",
+      "ComponentImage":{"Description":"","Url":""},
+      "DemoUrl":{"Description":"","Url":""},
+      "ComponentLimitations":"",
+      "TechnologyStack":{"results":[""]},
+      "ComponentOwner":{"Title":"","UserName":""},
+      "ComponentReviewers":{"results":[{"Title":"","UserName":""}]},
+      "ArtifactsLocation":{"Description":"","Url":""},
+      "ComponentFeatures":{"results":[{"Title":""}]},
+      "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
+      "NoOfDownloads":"0",
+      "FavouriteAssociatesId":{"results":number[]},
+      "FavouriteAssociates":{"results":[{"Title":string,"UserName":string,"Id":number}]}
+    };
+    currentUser:{
+      "Id":number,
+      "Email":string,
+      "LoginName":string,
+      "Title":string
+    };
+
 } 
 
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -50,7 +58,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentFeatures":{"results":[{"Title":""}]},
         "DownloadedAssociates":{"results":[{"Title":"","UserName":""}]},
         "NoOfDownloads":"0",
-        "FavouriteAssociatesId":{"results":[0]}
+        "FavouriteAssociatesId":{"results":[0]},
+        "FavouriteAssociates":{"results":[{"Title":"","UserName":"","Id":0}]}
+      },
+      currentUser:{
+        "Id":0,
+        "Email":"",
+        "LoginName":"",
+        "Title":""
       }
     };
   } 
@@ -63,7 +78,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     this.id = window.location.search.split("ComponentID=")[1];
     // Get component details by id
     jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+this.id+`)?$expand=ComponentOwner,ComponentReviewers, DownloadedAssociates, ComponentFeatures&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId`, 
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+this.id+`)?$expand=ComponentOwner,ComponentReviewers,DownloadedAssociates,ComponentFeatures,FavouriteAssociates&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId,FavouriteAssociates/Title,FavouriteAssociates/UserName,FavouriteAssociates/Id`, 
         type: "GET", 
         headers:{'Accept': 'application/json; odata=verbose;'}, 
         success: function(resultData) {  
@@ -71,6 +86,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           reactHandler.setState({ 
             item: resultData.d
           }); 
+          reactHandler.getUserDetails();
           // Get artifact document set for the component
           jquery.ajax({ 
             url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+this.id+"%27", 
@@ -127,21 +143,22 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <h3>No Demo available</h3>
         );
       }
-  }
-
-  
-
-  
-  public  getUserId(email:string):number{
+      
+  }  
+  public  getUserDetails():number{
     let id:number = 0;
-    //var email=this.context.pageContext.user.email;
-    pnp.sp.site.rootWeb.ensureUser(email).then(result => {
-      id = result.data.Id;
-    })
+    var reactHandler = this;
+    pnp.sp.web.currentUser.get().then((user) => {
+      reactHandler.setState({ 
+        currentUser: user
+       }); 
+        console.log(user);
+        id = user.Id;
+    });
     return id;
   }
   private renderFavouriteImage(){
-    if(this.state.item.FavouriteAssociatesId.results.indexOf(15) != -1){
+    if(this.state.item.FavouriteAssociatesId.results.indexOf(this.state.currentUser.Id) != -1){
       return(
         <img id="imgFav" 
           src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
@@ -157,21 +174,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     }
   }
 
-  // private _externalJsUrl: string = "https://cosmo2013.sharepoint.com/sites/SPMarketPlace/Style%20Library/MarketPlace/Tiles.js";
- 
   
-  // public onInit(): Promise<void> {
-  //   console.log(`ComponentDetails.onInit(): Entered.`);
-    
-  //   let scriptTag: HTMLScriptElement = document.createElement("script");
-  //   scriptTag.src = this._externalJsUrl;
-  //   scriptTag.type = "text/javascript";
-  //   document.getElementsByTagName("head")[0].appendChild(scriptTag);
- 
-  //   console.log(`ComponentDetails.onInit(): Added script link.`);
-  //   console.log(`ComponentDetailsx.onInit(): Leaving.`);
-  //   return Promise.resolve<void>();
-  // }
 
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (

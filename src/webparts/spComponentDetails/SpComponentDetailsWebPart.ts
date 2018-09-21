@@ -17,8 +17,7 @@ export interface ISpComponentDetailsWebPartProps {
 }
 
 export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISpComponentDetailsWebPartProps> {
-
-  public render(): void {
+   public render(): void {
     const element: React.ReactElement<ISpComponentDetailsProps > = React.createElement(
       SpComponentDetails,
       {
