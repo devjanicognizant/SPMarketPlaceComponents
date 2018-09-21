@@ -4,7 +4,7 @@ import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
-import pnp from 'sp-pnp-js'
+import pnp  from 'sp-pnp-js'
 
 export interface ISpComponentDetailsState{ 
   artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]};
@@ -174,7 +174,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     }
   }
 
-  
 
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
