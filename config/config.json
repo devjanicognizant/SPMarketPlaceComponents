@@ -9,12 +9,19 @@
           "manifest": "./src/webparts/spComponentDetails/SpComponentDetailsWebPart.manifest.json"
         }
       ]
+    },
+    "quick-links-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/quickLinks/QuickLinksWebPart.js",
+          "manifest": "./src/webparts/quickLinks/QuickLinksWebPart.manifest.json"
+        }
+      ]
     }
   },
-  "externals": {
-    
-  },
+  "externals": {},
   "localizedResources": {
-    "SpComponentDetailsWebPartStrings": "lib/webparts/spComponentDetails/loc/{locale}.js"
+    "SpComponentDetailsWebPartStrings": "lib/webparts/spComponentDetails/loc/{locale}.js",
+    "QuickLinksWebPartStrings": "lib/webparts/quickLinks/loc/{locale}.js"
   }
 }
