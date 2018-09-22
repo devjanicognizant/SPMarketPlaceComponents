@@ -9,10 +9,19 @@
           "manifest": "./src/webparts/spComponentDetails/SpComponentDetailsWebPart.manifest.json"
         }
       ]
+    },
+    "icon-based-navigation-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/iconBasedNavigation/IconBasedNavigationWebPart.js",
+          "manifest": "./src/webparts/iconBasedNavigation/IconBasedNavigationWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "SpComponentDetailsWebPartStrings": "lib/webparts/spComponentDetails/loc/{locale}.js"
+    "SpComponentDetailsWebPartStrings": "lib/webparts/spComponentDetails/loc/{locale}.js",
+    "IconBasedNavigationWebPartStrings": "lib/webparts/iconBasedNavigation/loc/{locale}.js"
   }
 }
