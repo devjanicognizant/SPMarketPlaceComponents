@@ -28,7 +28,6 @@
     "sp-pnp-js": "^3.0.10"
   },
   "devDependencies": {
-<<<<<<< HEAD
     "@microsoft/generator-sharepoint": "^1.6.0",
     "@microsoft/sp-build-web": "1.5.1",
     "@microsoft/sp-module-interfaces": "1.5.1",
@@ -37,15 +36,5 @@
     "@types/mocha": "2.2.38",
     "ajv": "~5.2.2",
     "gulp": "~3.9.1"
-=======
-    "@microsoft/sp-build-web": "1.6.0",
-    "@microsoft/sp-module-interfaces": "1.6.0",
-    "@microsoft/sp-webpart-workbench": "1.6.0",
-    "gulp": "~3.9.1",
-    "@types/chai": "3.4.34",
-    "@types/mocha": "2.2.38",
-    "ajv": "~5.2.2",
-    "tslint-microsoft-contrib": "~5.0.0"
->>>>>>> 885553a145d155f843ee303400c0d4ab5b873fac
   }
 }
