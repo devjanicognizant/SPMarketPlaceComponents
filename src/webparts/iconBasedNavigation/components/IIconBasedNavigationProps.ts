@@ -1,3 +1,3 @@
 export interface IIconBasedNavigationProps {
-  description: string;
+  iconListName: string;
 }

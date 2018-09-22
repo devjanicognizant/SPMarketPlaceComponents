@@ -1,7 +1,7 @@
 declare interface IIconBasedNavigationWebPartStrings {
   PropertyPaneDescription: string;
   BasicGroupName: string;
-  DescriptionFieldLabel: string;
+  IconListNameFieldLabel: string;
 }
 
 declare module 'IconBasedNavigationWebPartStrings' {

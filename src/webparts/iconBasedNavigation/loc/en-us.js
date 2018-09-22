@@ -1,7 +1,7 @@
 define([], function() {
   return {
-    "PropertyPaneDescription": "Description",
-    "BasicGroupName": "Group Name",
-    "DescriptionFieldLabel": "Description Field"
+    "PropertyPaneDescription": "Icon Based Navigation Webpart",
+    "BasicGroupName": "Custom Property",
+    "IconListNameFieldLabel": "List to fetch the Icons"
   }
 });

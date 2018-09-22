@@ -12,7 +12,7 @@ import IconBasedNavigation from './components/IconBasedNavigation';
 import { IIconBasedNavigationProps } from './components/IIconBasedNavigationProps';
 
 export interface IIconBasedNavigationWebPartProps {
-  description: string;
+  iconListName: string;
 }
 
 export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<IIconBasedNavigationWebPartProps> {
@@ -21,7 +21,7 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
     const element: React.ReactElement<IIconBasedNavigationProps > = React.createElement(
       IconBasedNavigation,
       {
-        description: this.properties.description
+        iconListName: this.properties.iconListName
       }
     );
 
@@ -47,8 +47,8 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
             {
               groupName: strings.BasicGroupName,
               groupFields: [
-                PropertyPaneTextField('description', {
-                  label: strings.DescriptionFieldLabel
+                PropertyPaneTextField('iconListName', {
+                  label: strings.IconListNameFieldLabel
                 })
               ]
             }
