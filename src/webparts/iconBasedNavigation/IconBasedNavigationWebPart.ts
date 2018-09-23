@@ -21,7 +21,8 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
     const element: React.ReactElement<IIconBasedNavigationProps > = React.createElement(
       IconBasedNavigation,
       {
-        iconListName: this.properties.iconListName
+        iconListName: this.properties.iconListName,
+        siteurl: this.context.pageContext.web.absoluteUrl
       }
     );
 
