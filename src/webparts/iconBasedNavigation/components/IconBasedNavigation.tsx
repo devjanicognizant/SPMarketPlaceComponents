@@ -34,7 +34,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
     var iconListName = this.props.iconListName;
-    pnp.sp.web.lists.getByTitle(iconListName).items.select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder").orderBy("QuickLinkOrder", true).get().then((items: any[]) => {
+    pnp.sp.web.lists.getByTitle(iconListName).items.select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder").orderBy("QuickLinkOrder", true).filter(`ItemStatus eq 'Active'`).get().then((items: any[]) => {
       console.log(items);
      
       let iconsRet = [{}] as [{
