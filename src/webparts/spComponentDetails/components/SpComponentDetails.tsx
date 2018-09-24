@@ -5,9 +5,21 @@ import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 import pnp  from 'sp-pnp-js'
+import {
+  Logger,
+  ConsoleListener,
+  LogLevel
+} from "sp-pnp-js";
+import { Conversation } from '../../../../node_modules/sp-pnp-js/lib/graph/conversations';
+
+// subscribe a listener
+Logger.subscribe(new ConsoleListener())
+
+// set the active log level
+Logger.activeLogLevel = LogLevel.Info;
 
 export interface ISpComponentDetailsState{ 
-  artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]};
+  artifacts:any[];
   item:{ 
       "ComponentTitle": "", 
       "ComponentCategory": "", 
@@ -40,7 +52,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public constructor(props: ISpComponentDetailsProps, state: ISpComponentDetailsState){ 
     super(props); 
     this.state = { 
-      artifacts:{results:[{"Name":"No Resource file available","ServerRelativeUrl":"javascript:"}]},
+      artifacts:[],
       item:{ 
         "ComponentTitle": "", 
         "ComponentCategory": "", 
@@ -74,59 +86,109 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
     var artifactListName = this.props.artifactsListName;
+    var inventoryList = this.props.inventoryListName;
     // Get component id from query string
     this.id = window.location.search.split("ComponentID=")[1];
-    // Get component details by id
-    jquery.ajax({ 
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+this.id+`)?$expand=ComponentOwner,ComponentReviewers,DownloadedAssociates,ComponentFeatures,FavouriteAssociates&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId,FavouriteAssociates/Title,FavouriteAssociates/UserName,FavouriteAssociates/Id`, 
-        type: "GET", 
-        headers:{'Accept': 'application/json; odata=verbose;'}, 
-        success: function(resultData) {  
-          resultData.d.ComponentDescriptionContent = { __html: resultData.d.ComponentDescription };
+    let compId:Number = Number(this.id);
+    pnp.sp.web.lists.getByTitle(inventoryList).items
+    .getById(Number(this.id))
+    .expand("ComponentOwner","ComponentReviewers","DownloadedAssociates","ComponentFeatures","FavouriteAssociates")
+    .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id")
+    .get()
+    .then((data: any) => {
+          data.ComponentDescriptionContent = { __html: data.ComponentDescription };
           reactHandler.setState({ 
-            item: resultData.d
+            item: data
           }); 
           reactHandler.getUserDetails();
           // Get artifact document set for the component
-          jquery.ajax({ 
-            url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+this.id+"%27", 
-            type: "GET", 
-            headers:{'Accept': 'application/json; odata=verbose;'}, 
-            success: function(resultData) {  
-              if(resultData.d.results.length>0)
+          pnp.sp.web.lists.getByTitle(artifactListName).items
+          .expand("Folder","Folder/ComponentID","Folder/ComponentID/Id")
+          .filter(`ComponentID/Id eq `+this.id)
+          .get()
+          .then((folders: any[]) => {
+              if(folders.length>0)
               {
-                // Get artifact files from the document set
-                var artifactLocationRelativeUrl = resultData.d.results[0].Folder.ServerRelativeUrl;
-                jquery.ajax({ 
-                  url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
-                  type: "GET", 
-                  headers:{'Accept': 'application/json; odata=verbose;'}, 
-                  success: function(resultData) {  
-                    reactHandler.setState({ 
-                     artifacts: resultData.d
-                    }); 
-                  }, 
-                  error : function(jqXHR, textStatus, errorThrown) { 
-                    console.log('Error occured while fetching component artifact files from document set');
-                    console.log(jqXHR.responseText);
-                  } 
-                });
+
+                 // Get artifact files from the document set
+                 var artifactLocationRelativeUrl = folders[0].Folder.ServerRelativeUrl;
+                 pnp.sp.web.getFolderByServerRelativeUrl(artifactLocationRelativeUrl).files.get()
+                 .then((documents: any[]) => {
+                  reactHandler.setState({ 
+                    artifacts:documents
+                   }); 
+                 })
+                 .catch((documents: any[]) => {
+                   console.log("log from devjani");
+                 });
+
+                 
               }
-              
-            }, 
-            error : function(jqXHR, textStatus, errorThrown) { 
-              console.log('Error occured while fetching component artifact document set');
-              console.log(jqXHR.responseText);
-            } 
+          })
+          .catch((error) => {
+            console.log("log from devjani")
           });
 
+
+         
+
+    });
+    // .catch((error) => {
+    //     console.log("log from devjani");
+    // });
+ 
+  
+    // // Get component details by id
+    // jquery.ajax({ 
+    //     url: `${this.props.siteurl}/_api/web/lists/getbytitle('${this.props.inventoryListName}')/items(`+this.id+`)?$expand=ComponentOwner,ComponentReviewers,DownloadedAssociates,ComponentFeatures,FavouriteAssociates&$select=ComponentTitle,ComponentCategory,ComponentDescription,ShortDescription,ComponentImage,DemoUrl,ComponentLimitations,ComponentOwner/Title, ComponentOwner/UserName,ArtifactsLocation,NoOfDownloads,ComponentReviewers/Title,ComponentReviewers/UserName, DownloadedAssociates/UserName, TechnologyStack, ComponentFeatures/Title, FavouriteAssociatesId,FavouriteAssociates/Title,FavouriteAssociates/UserName,FavouriteAssociates/Id`, 
+    //     type: "GET", 
+    //     headers:{'Accept': 'application/json; odata=verbose;'}, 
+    //     success: function(resultData) {  
+    //       resultData.d.ComponentDescriptionContent = { __html: resultData.d.ComponentDescription };
+    //       reactHandler.setState({ 
+    //         item: resultData.d
+    //       }); 
+    //       reactHandler.getUserDetails();
+    //       // Get artifact document set for the component
+    //       jquery.ajax({ 
+    //         url: siteUrl+ "/_api/web/lists/getbytitle('"+artifactListName+"')/items?$expand=Folder,Folder/ComponentID,Folder/ComponentID/Id&$filter=ComponentID/Id%20eq%20%27"+this.id+"%27", 
+    //         type: "GET", 
+    //         headers:{'Accept': 'application/json; odata=verbose;'}, 
+    //         success: function(resultData) {  
+    //           if(resultData.d.results.length>0)
+    //           {
+    //             // Get artifact files from the document set
+    //             var artifactLocationRelativeUrl = resultData.d.results[0].Folder.ServerRelativeUrl;
+    //             jquery.ajax({ 
+    //               url: siteUrl+ "/_api/Web/GetFolderByServerRelativeUrl('"+artifactLocationRelativeUrl+"')/files", 
+    //               type: "GET", 
+    //               headers:{'Accept': 'application/json; odata=verbose;'}, 
+    //               success: function(resultData) {  
+    //                 reactHandler.setState({ 
+    //                  artifacts: resultData.d
+    //                 }); 
+    //               }, 
+    //               error : function(jqXHR, textStatus, errorThrown) { 
+    //                 console.log('Error occured while fetching component artifact files from document set');
+    //                 console.log(jqXHR.responseText);
+    //               } 
+    //             });
+    //           }
+              
+    //         }, 
+    //         error : function(jqXHR, textStatus, errorThrown) { 
+    //           console.log('Error occured while fetching component artifact document set');
+    //           console.log(jqXHR.responseText);
+    //         } 
+    //       });
+
           
-        }, 
-        error : function(jqXHR, textStatus, errorThrown) { 
-          console.log('Error occured while fetching component item details');
-          console.log(jqXHR.responseText);
-        } 
-    }); 
+    //     }, 
+    //     error : function(jqXHR, textStatus, errorThrown) { 
+    //       console.log('Error occured while fetching component item details');
+    //       console.log(jqXHR.responseText);
+    //     } 
+    // }); 
    
   } 
 
@@ -158,20 +220,21 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     return id;
   }
   private renderFavouriteImage(){
-    if(this.state.item.FavouriteAssociatesId.results.indexOf(this.state.currentUser.Id) != -1){
-      return(
-        <img id="imgFav" 
-          src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
-      )
-    }
-    else{
-      return(
-      <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
-        <img id="imgFav" 
-          src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
-      </a>
-      );
-    }
+    // if(this.state.item.FavouriteAssociatesId.results.indexOf(this.state.currentUser.Id) != -1){
+    //   return(
+    //     <img id="imgFav" 
+    //       src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
+    //   )
+    // }
+    // else{
+    //   return(
+    //   <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
+    //     <img id="imgFav" 
+    //       src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
+    //   </a>
+    //   );
+    // }
+    return("<div></div>")
   }
 
 
@@ -212,7 +275,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   </div>
                   <div id="divAdditionalResources">
                     <ul>
-                      {this.state.artifacts.results.map(function(d, idx){
+                      {this.state.artifacts.map(function(d, idx){
                         return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>);
                       })}
                     </ul>

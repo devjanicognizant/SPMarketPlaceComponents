@@ -5,6 +5,17 @@ import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 import pnp  from 'sp-pnp-js'
+import {
+  Logger,
+  ConsoleListener,
+  LogLevel
+} from "sp-pnp-js";
+
+// subscribe a listener
+Logger.subscribe(new ConsoleListener())
+
+// set the active log level
+Logger.activeLogLevel = LogLevel.Info;
 
 export interface IIconBasedNavigationState{
   icons:[{
@@ -34,7 +45,12 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     var reactHandler = this; 
     var siteUrl = this.props.siteurl;
     var iconListName = this.props.iconListName;
-    pnp.sp.web.lists.getByTitle(iconListName).items.select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder").orderBy("QuickLinkOrder", true).filter(`ItemStatus eq 'Active'`).get().then((items: any[]) => {
+    pnp.sp.web.lists.getByTitle(iconListName).items
+    .select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder")
+    .orderBy("QuickLinkOrder", true)
+    .filter(`ItemStatus eq 'Active'`)
+    .get()
+    .then((items: any[]) => {
       console.log(items);
      
       let iconsRet = [{}] as [{
@@ -56,6 +72,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
       }); 
 
     });
+ 
   }
 
   public render(): React.ReactElement<IIconBasedNavigationProps> {
