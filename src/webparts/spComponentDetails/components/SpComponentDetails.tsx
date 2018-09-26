@@ -219,7 +219,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={ styles.spComponentDetails }>
-          <Row className={styles.containerRow}> 
+          <Row className={ styles.containerRow }> 
               <Column flexGrow={1} className={styles.width50}>
                 <div>
                   <div id="divComponentTitle">
