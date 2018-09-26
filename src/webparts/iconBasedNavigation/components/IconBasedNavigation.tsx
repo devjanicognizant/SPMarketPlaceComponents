@@ -5,84 +5,81 @@ import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 import pnp  from 'sp-pnp-js';
-import {
-  Logger,
-  ConsoleListener,
-  LogLevel
-} from "sp-pnp-js";
 
-// subscribe a listener
-Logger.subscribe(new ConsoleListener());
+import LogManager from '../../LogManager';
 
-// set the active log level
-Logger.activeLogLevel = LogLevel.Info;
-
+// Represents the webpart state interface
 export interface IIconBasedNavigationState{
-  icons:[{
-      "QuickLinkTitle": "", 
-      "QuickLinkUrl":{"Description":"","Url":""},
-      "QuickLinkImage":{"Description":"","Url":""},
-      "QuickLinkOrder":number
-    }];
-  test:string;
+  icons:any[];
 } 
+// React enabled component class implementing property and state interfaces
 export default class IconBasedNavigation extends React.Component<IIconBasedNavigationProps, IIconBasedNavigationState> {
   public constructor(props: IIconBasedNavigationProps, state: IIconBasedNavigationState){ 
     super(props); 
+    // Icon lists to be part of the state
     this.state = {
-      icons:[{
-          "QuickLinkTitle": "", 
-          "QuickLinkUrl":{"Description":"","Url":""},
-          "QuickLinkImage":{"Description":"","Url":""},
-          "QuickLinkOrder":0
-        }],
-      test:"test"
-
+      icons:[]
     };
   } 
 
+  // Fetch the icon list from the configuration list
+  // List name is configured as webpart properties
   public componentDidMount(){
     var reactHandler = this; 
+    // Get the site url from property
     var siteUrl = this.props.siteurl;
+
+    // Get icon configuration list name from property
     var iconListName = this.props.iconListName;
+
+    // Service call to fetch active set of icon list from list
+    // The list is ordered by QuickLinkOrder column
+    // Icons would be skipped if QuickLinkUrl or QuickLinkImage are not set
     pnp.sp.web.lists.getByTitle(iconListName).items
     .select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder")
     .orderBy("QuickLinkOrder", true)
     .filter(`ItemStatus eq 'Active'`)
     .get()
     .then((items: any[]) => {
-      console.log(items);
-     
-      let iconsRet = [{}] as [{
-        "QuickLinkTitle": "", 
-        "QuickLinkUrl":{"Description":"","Url":""},
-        "QuickLinkImage":{"Description":"","Url":""},
-        "QuickLinkOrder":number
-      }];
-      iconsRet.pop();
+      // Local variable to store the relevant links
+      let iconsRet: any[]=[];
+      // Iterate throught eh list of items received from service call
       for(let item of items)
       {
+        // Only add the item having the linkurl and imageurl set
         if(item.QuickLinkImage != null && item.QuickLinkUrl != null)
         {
           iconsRet.push(item);
         }
       }
       reactHandler.setState({ 
+        // Set the icon list to the state
         icons: iconsRet
       }); 
-
+    })
+    .catch(error => {
+      LogManager.logException(error
+        ,"Error occured while fetching icon details from SP list"
+        ,"Icon Based Navigation"
+        ,"componentDidMount");
     });
- 
   }
 
+  // Build and render the markup to the page
   public render(): React.ReactElement<IIconBasedNavigationProps> {
     return (
       <div className={ styles.iconBasedNavigation }>
-        <Row vertical='top'> 
+        <Row className={styles.containerRow}> 
           {this.state.icons.map((d, idx)=>{
-            return (<Column key={idx}><a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}><img width="50px" height="50px" alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> </a></Column>);
-          })}
-        
+            return (
+                <Column key={idx}>
+                    <a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}>
+                    <img className={styles.imgIcon}
+                      alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> 
+                  </a>
+                </Column>);
+            })
+          }
         </Row>
       </div>
     );
