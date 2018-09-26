@@ -152,14 +152,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       {
         // SHow demo link
         return(
-          <h3><a href={this.state.item.DemoUrl.Url}>View Demo</a></h3>
+          <p className={styles.rcorner}><a href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
         );
       }
       else
       {
         // Show message
         return(
-          <h3>No Demo available</h3>
+          <p className={styles.rcornerDisabled}>No Demo available</p>
         );
       }
   }  
@@ -201,16 +201,24 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   private renderFavouriteImage(){
     if(this.state.item.FavouriteAssociatesId != null && this.state.item.FavouriteAssociatesId.indexOf(this.state.currentUser.Id) != -1){
       return(
-        <img id="imgFav" 
-          src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
+          <p className={styles.rcornerDisabled}>
+            <span className={styles.favLbl}>Add to favourite </span>
+              <img id="imgFav" 
+                src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png">
+              </img>
+          </p>
       );
     }
     else{
       return(
-      <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
-        <img id="imgFav" 
-          src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
-      </a>
+          <p className={styles.rcorner}>
+            <span className={styles.favLbl}>Add to favourite </span>
+            <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
+              <img id="imgFav" 
+                src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
+            </a>
+          </p>
+      
       );
     }
   }
@@ -260,7 +268,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   </div>
                   <br/>
                   <div id="divComponentOwner">
-                    <h3><a href={'mailto:'+this.state.item.ComponentOwner.UserName} className={styles.button}>Contact Component Owner</a></h3>
+                    <p className={styles.rcorner}>
+                      <a href={'mailto:'+this.state.item.ComponentOwner.UserName} className={styles.link}>Contact Component Owner</a>
+                    </p>
                   </div>
                 </div>
                 <br/>

@@ -31,6 +31,46 @@
     vertical-align: top;
   }
 
+  .rcorner {
+    border-radius: 25px;
+    border: 2px solid #0072bc;
+    background-color:  #0072bc;
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+    width: 210px; 
+    color: white;  
+    text-align: center;
+  }
+  .rcornerDisabled {
+    border-radius: 25px;
+    border: 2px solid #a0a2a3;
+    background-color:  #a0a2a3; 
+    width: 210px; 
+    color: white;  
+    text-align: center;
+    padding-top: 15px; 
+    padding-bottom: 15px; 
+  }
+  .link{
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      
+  }
+  .link:visited{
+      color: white !important;
+      text-decoration: none !important;
+      font-weight: bold;
+  }
+  .btnContainerDiv{
+    text-align:center;
+  }
+  .favLbl
+  {
+    vertical-align: top;
+  }
+
+
   .column {
     @include ms-Grid-col;
     @include ms-lg10;
