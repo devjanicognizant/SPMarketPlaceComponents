@@ -4,7 +4,7 @@ import { IIconBasedNavigationProps } from './IIconBasedNavigationProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
-import pnp  from 'sp-pnp-js'
+import pnp  from 'sp-pnp-js';
 import {
   Logger,
   ConsoleListener,
@@ -12,7 +12,7 @@ import {
 } from "sp-pnp-js";
 
 // subscribe a listener
-Logger.subscribe(new ConsoleListener())
+Logger.subscribe(new ConsoleListener());
 
 // set the active log level
 Logger.activeLogLevel = LogLevel.Info;
@@ -38,7 +38,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
         }],
       test:"test"
 
-    }
+    };
   } 
 
   public componentDidMount(){

@@ -4,7 +4,7 @@ import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
-import pnp  from 'sp-pnp-js'
+import pnp  from 'sp-pnp-js';
 import {
   Logger,
   ConsoleListener,
@@ -12,7 +12,7 @@ import {
 } from "sp-pnp-js";
 
 // subscribe a listener
-Logger.subscribe(new ConsoleListener())
+Logger.subscribe(new ConsoleListener());
 
 // set the active log level
 Logger.activeLogLevel = LogLevel.Info;
@@ -155,8 +155,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     {
       var artifactMarkup = 
       this.state.artifacts.map(function(d, idx){
-        return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>)
-      })
+        return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>);
+      });
       return(artifactMarkup);
     }
     else
@@ -184,7 +184,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       return(
         <img id="imgFav" 
           src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png"></img>
-      )
+      );
     }
     else{
       return(
