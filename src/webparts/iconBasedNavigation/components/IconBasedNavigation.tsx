@@ -79,7 +79,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     return (
       <div className={ styles.iconBasedNavigation }>
         <Row vertical='top'> 
-          {this.state.icons.map(function(d, idx){
+          {this.state.icons.map((d, idx)=>{
             return (<Column key={idx}><a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}><img width="50px" height="50px" alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> </a></Column>);
           })}
         

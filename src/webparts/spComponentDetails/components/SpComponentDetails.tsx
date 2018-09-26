@@ -154,7 +154,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     if(this.state.artifacts != null && this.state.artifacts.length>0)
     {
       var artifactMarkup = 
-      this.state.artifacts.map(function(d, idx){
+      this.state.artifacts.map((d, idx)=>{
         return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>);
       });
       return(artifactMarkup);
