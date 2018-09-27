@@ -29,7 +29,8 @@ export interface ISpComponentDetailsState{
       "DownloadedAssociates":any[],
       "NoOfDownloads":"0",
       "FavouriteAssociatesId":any[]
-      "FavouriteAssociates":any[]
+      "FavouriteAssociates":any[],
+      "FavoriteAssociates":""
     };
     // Hold current user details
     currentUser:{
@@ -64,7 +65,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DownloadedAssociates":[],
         "NoOfDownloads":"0",
         "FavouriteAssociatesId":[],
-        "FavouriteAssociates":[]
+        "FavouriteAssociates":[],
+        "FavoriteAssociates":""
       },
       currentUser:{
         "Id":0,
@@ -96,7 +98,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     pnp.sp.web.lists.getByTitle(inventoryList).items
     .getById(Number(this.id))
     .expand("ComponentOwner","ComponentReviewers","DownloadedAssociates","ComponentFeatures","FavouriteAssociates")
-    .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id")
+    .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id","FavoriteAssociates")
     .get()
     .then((data: any) => {
           data.ComponentDescriptionContent = { __html: data.ComponentDescription };
@@ -199,7 +201,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // Return different markup when user has already set the component as favourite
   // and different markup when user is yet to set it as favourite
   private renderFavouriteImage(){
-    if(this.state.item.FavouriteAssociatesId != null && this.state.item.FavouriteAssociatesId.indexOf(this.state.currentUser.Id) != -1){
+    // Get user's login name without membership detials part
+    var userLoginName = this.state.currentUser.LoginName.split(/[| ]+/).pop();
+    if(this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1){
       return(
           <p className={styles.rcornerDisabled}>
             <span className={styles.favLbl}>Add to favourite </span>
@@ -213,7 +217,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       return(
           <p className={styles.rcorner}>
             <span className={styles.favLbl}>Add to favourite </span>
-            <a href={"javascript:CognizantCDBMP.addToFavorite("+this.id+", 'imgFav');"}>
+            <a href={"javascript:CognizantCDBMP.addToFavorite('"+this.id+"', 'imgFav');"}>
               <img id="imgFav" 
                 src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
             </a>
