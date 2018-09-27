@@ -226,9 +226,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // Build and render the final markupo to show on the page
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
-      <div className={ styles.spComponentDetails }>
+      <div className={styles.spComponentDetails }>
           <Row className={ styles.containerRow }> 
-              <Column flexGrow={1} className={styles.width50}>
+              <Column flexGrow={1} className={styles.left}>
                 <div>
                   <div id="divComponentTitle">
                     <h1>{escape(this.state.item.ComponentTitle)}</h1>
@@ -244,9 +244,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   </div>
                 </div>
               </Column>
-              <Column flexGrow={1} className={styles.width10}>
+              <Column flexGrow={1} className={styles.middle}>
               </Column>
-              <Column flexGrow={1} className={styles.width40}>
+              <Column flexGrow={1} className={styles.right}>
                 <div>
                   <br />
                   <div id="divDemoUrl">
