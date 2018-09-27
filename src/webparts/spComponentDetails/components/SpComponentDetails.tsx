@@ -30,7 +30,10 @@ export interface ISpComponentDetailsState{
       "NoOfDownloads":"0",
       "FavouriteAssociatesId":any[]
       "FavouriteAssociates":any[],
-      "FavoriteAssociates":""
+      "FavoriteAssociates":"",
+      "LikedById":any[],
+      "LikesCount":number
+
     };
     // Hold current user details
     currentUser:{
@@ -66,7 +69,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "NoOfDownloads":"0",
         "FavouriteAssociatesId":[],
         "FavouriteAssociates":[],
-        "FavoriteAssociates":""
+        "FavoriteAssociates":"",
+        "LikedById":[],
+        "LikesCount":0
       },
       currentUser:{
         "Id":0,
@@ -97,8 +102,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
     .getById(Number(this.id))
-    .expand("ComponentOwner","ComponentReviewers","DownloadedAssociates","ComponentFeatures","FavouriteAssociates")
-    .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id","FavoriteAssociates")
+    .expand("ComponentOwner","ComponentReviewers","DownloadedAssociates","ComponentFeatures","FavouriteAssociates","LikedBy")
+    .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id","FavoriteAssociates","LikedBy/Id","LikedById","LikesCount")
     .get()
     .then((data: any) => {
           data.ComponentDescriptionContent = { __html: data.ComponentDescription };
@@ -227,6 +232,47 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     }
   }
 
+  // Return different markup when user has already set the component as favourite
+  // and different markup when user is yet to set it as favourite
+  private renderLike(){
+    // Get user's login name without membership detials part
+    var likeClass="hide";
+    var unlikeClass="hide";
+    if(this.state.item.LikedById != null 
+      && this.state.item.LikedById.indexOf(this.state.currentUser.Id) != -1){
+        unlikeClass = "show";
+      }
+      else{
+        likeClass="show";
+      }
+      return(
+        <div className={styles.rcorner}>
+          <div id="likeIcon" className={likeClass}>
+            <p>
+              <span className={styles.favLbl}>Like it! </span>
+              <a href={"javascript:SetLike(true,'"+this.props.inventoryListName+"',"+this.id+")"}>
+                <img id="imgLike" className={styles.imgIcon}
+                  src="/sites/SPMarketPlace/Style%20Library/Images/like.png"></img>
+              </a>
+              
+            </p>
+          </div>
+          <div  id="dislikeIcon" className={unlikeClass}>
+            <p >
+              <span className={styles.favLbl}>Unlike it! </span>
+              <a href={"javascript:SetLike(false,'"+this.props.inventoryListName+"',"+this.id+")"}>
+                <img id="imgLike"  className={styles.imgIcon}
+                  src="/sites/SPMarketPlace/Style%20Library/Images/dislike.png"></img>
+              </a>
+              
+            </p>
+          </div>
+          <span className={styles.favLbl}> Total Likes: </span><span className={styles.favLbl} id="likeCount">{this.state.item.LikesCount}</span>
+       </div>
+      );
+    
+  }
+
   // Build and render the final markupo to show on the page
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
@@ -280,6 +326,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 <br/>
                 <div id="divFav">
                    {this.renderFavouriteImage()} 
+                </div>
+                <br/>
+                <div id="divLike">
+                   {this.renderLike()} 
                 </div>
               </Column>
           </Row>
