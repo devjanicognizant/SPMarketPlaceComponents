@@ -1,8 +1,6 @@
 import * as React from 'react';
 import styles from './IconBasedNavigation.module.scss';
 import { IIconBasedNavigationProps } from './IIconBasedNavigationProps';
-import { escape } from '@microsoft/sp-lodash-subset';
-import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 import pnp  from 'sp-pnp-js';
 

@@ -2,7 +2,6 @@ import * as React from 'react';
 import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
-import * as jquery from 'jquery';
 import { Column, Row } from 'simple-flexbox';
 import pnp from 'sp-pnp-js';
 import LogManager from '../../LogManager';
@@ -60,7 +59,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "TechnologyStack": [],
         "ComponentOwner": { "Title": "", "UserName": "" },
         "ComponentReviewers": [],
-
         "ArtifactsLocation": { "Description": "", "Url": "" },
         "ComponentFeatures": [],
         "FavouriteAssociatesId": [],
@@ -106,23 +104,18 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentImage"
         , "DemoUrl"
         , "ComponentLimitations"
-        , "ComponentOwner/Title"
-        , "ComponentOwner/UserName"
+        , "ComponentOwner/Title", "ComponentOwner/UserName"
         , "ArtifactsLocation"
-        , "ComponentReviewers/Title"
-        , "ComponentReviewers/UserName"
+        , "ComponentReviewers/Title", "ComponentReviewers/UserName"
         , "TechnologyStack"
         , "ComponentFeatures/Title"
-        , "FavouriteAssociatesId"
-        , "FavouriteAssociates/Title"
-        , "FavouriteAssociates/UserName"
-        , "FavouriteAssociates/Id"
+        , "FavouriteAssociatesId", "FavouriteAssociates/Title", "FavouriteAssociates/UserName", "FavouriteAssociates/Id"
         , "FavoriteAssociates"
-        , "LikedBy/Id"
-        , "LikedById", "LikesCount")
+        , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
       .then((data: any) => {
-        // When anyone is yet to like the component, LikesCount comes as null. Set it as 0
+        // When anyone is yet to like the component, LikesCount comes as null. 
+        // Set it as 0 in case it is null
         if (data.LikesCount == null) {
           data.LikesCount = 0;
         }
@@ -151,7 +144,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 .catch((error) => {
                   LogManager.logException(error
                     , "Error occured while fetching component artifact files from document set"
-                    , "Icon Based Navigation"
+                    , "Cpmponent Details"
                     , "componentDidMount");
                 });
             }
@@ -166,7 +159,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       .catch((error) => {
         LogManager.logException(error
           , "Error occured while fetching component item details."
-          , "Icon Based Navigation"
+          , "Cpmponent Details"
           , "componentDidMount");
       });
   }
@@ -215,6 +208,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         // Set the returned user object to state
         currentUser: user
       });
+    })
+    .catch((error) => {
+      LogManager.logException(error
+        , "Error occured while fetching current user details."
+        , "Cpmponent Details"
+        , "getUserDetails");
     });
   }
 
@@ -289,7 +288,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     );
   }
 
-  // Build and render the final markupo to show on the page
+  // Build and render the final markup to show on the page
+  // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
       <div className={styles.spComponentDetails}>
