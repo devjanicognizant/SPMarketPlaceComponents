@@ -216,7 +216,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     if(this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1){
       // Markup if user has already set the component as favourite
       return(
-          <p className={styles.rcornerDisabled}>
+          <p className={styles.rcornerDisabled} id="pFavInactive">
             <span className={styles.topAlign}>Add to favourite </span>
               <img id="imgFav" 
                 src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png">
@@ -227,14 +227,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     else{
       // Markup if user is yet to set the component as favourite
       return(
-          <p className={styles.rcorner}>
+          <p className={styles.rcorner} id="pFavActive">
             <span className={styles.topAlign}>Add to favourite </span>
             <a href={"javascript:CognizantCDBMP.addToFavorite('"+this.id+"', 'imgFav');"}>
               <img id="imgFav" 
                 src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
             </a>
           </p>
-      
       );
     }
   }
