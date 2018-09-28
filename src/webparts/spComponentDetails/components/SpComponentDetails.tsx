@@ -13,14 +13,12 @@ export interface ISpComponentDetailsState {
   // Component item
   item: {
     "ComponentTitle": "",
-    "ComponentCategory": "",
     "ComponentDescription": "",
     "ComponentDescriptionContent": { __html: "" },
     "ShortDescription": "",
     "ComponentImage": { "Description": "", "Url": "" },
     "DemoUrl": { "Description": "", "Url": "" },
     "ComponentLimitations": "",
-    "TechnologyStack": any[],
     "ComponentOwner": { "Title": "", "UserName": "" },
     "ComponentReviewers": any[],
     "ArtifactsLocation": { "Description": "", "Url": "" },
@@ -49,14 +47,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       artifacts: [],
       item: {
         "ComponentTitle": "",
-        "ComponentCategory": "",
         "ComponentDescription": "",
         "ComponentDescriptionContent": { __html: "" },
         "ShortDescription": "",
         "ComponentImage": { "Description": "", "Url": "" },
         "DemoUrl": { "Description": "", "Url": "" },
         "ComponentLimitations": "",
-        "TechnologyStack": [],
         "ComponentOwner": { "Title": "", "UserName": "" },
         "ComponentReviewers": [],
         "ArtifactsLocation": { "Description": "", "Url": "" },
@@ -98,7 +94,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       .getById(Number(this.id))
       .expand("ComponentOwner", "ComponentReviewers", "ComponentFeatures", "FavouriteAssociates", "LikedBy")
       .select("ComponentTitle"
-        , "ComponentCategory"
         , "ComponentDescription"
         , "ShortDescription"
         , "ComponentImage"
@@ -107,7 +102,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentOwner/Title", "ComponentOwner/UserName"
         , "ArtifactsLocation"
         , "ComponentReviewers/Title", "ComponentReviewers/UserName"
-        , "TechnologyStack"
         , "ComponentFeatures/Title"
         , "FavouriteAssociatesId", "FavouriteAssociates/Title", "FavouriteAssociates/UserName", "FavouriteAssociates/Id"
         , "FavoriteAssociates"
