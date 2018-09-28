@@ -106,6 +106,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     .select("ComponentTitle","ComponentCategory","ComponentDescription","ShortDescription","ComponentImage","DemoUrl","ComponentLimitations","ComponentOwner/Title", "ComponentOwner/UserName","ArtifactsLocation","NoOfDownloads","ComponentReviewers/Title","ComponentReviewers/UserName", "DownloadedAssociates/UserName", "TechnologyStack", "ComponentFeatures/Title", "FavouriteAssociatesId","FavouriteAssociates/Title","FavouriteAssociates/UserName","FavouriteAssociates/Id","FavoriteAssociates","LikedBy/Id","LikedById","LikesCount")
     .get()
     .then((data: any) => {
+          // When anyone is yet to like the component, LikesCount comes as null. Set it as 0
+          if(data.LikesCount == null){
+            data.LikesCount = 0;
+          }
           data.ComponentDescriptionContent = { __html: data.ComponentDescription };
           reactHandler.setState({ 
             // Assign returned list item data to state
@@ -155,11 +159,11 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // Check the demo link is set or not
   // If demo link is not set, show message on the page, set show the demo link
   private renderDemoLink(){
-    if(this.state.item.DemoUrl != null)
+      if(this.state.item.DemoUrl != null)
       {
-        // SHow demo link
+        // Show demo link
         return(
-          <p className={styles.rcorner}><a href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
+          <p className={styles.rcorner}><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
         );
       }
       else
@@ -208,10 +212,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   private renderFavouriteImage(){
     // Get user's login name without membership detials part
     var userLoginName = this.state.currentUser.LoginName.split(/[| ]+/).pop();
+    
     if(this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1){
+      // Markup if user has already set the component as favourite
       return(
           <p className={styles.rcornerDisabled}>
-            <span className={styles.favLbl}>Add to favourite </span>
+            <span className={styles.topAlign}>Add to favourite </span>
               <img id="imgFav" 
                 src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png">
               </img>
@@ -219,9 +225,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       );
     }
     else{
+      // Markup if user is yet to set the component as favourite
       return(
           <p className={styles.rcorner}>
-            <span className={styles.favLbl}>Add to favourite </span>
+            <span className={styles.topAlign}>Add to favourite </span>
             <a href={"javascript:CognizantCDBMP.addToFavorite('"+this.id+"', 'imgFav');"}>
               <img id="imgFav" 
                 src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
@@ -232,12 +239,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     }
   }
 
-  // Return different markup when user has already set the component as favourite
-  // and different markup when user is yet to set it as favourite
+  // Return different markup when user has already likes the component
+  // and different markup when user is yet to like the component
   private renderLike(){
-    // Get user's login name without membership detials part
+    // Initially hide both like and unlike divs
     var likeClass="hide";
     var unlikeClass="hide";
+    // Set the css class based on the status whether user liked the component or not
     if(this.state.item.LikedById != null 
       && this.state.item.LikedById.indexOf(this.state.currentUser.Id) != -1){
         unlikeClass = "show";
@@ -245,32 +253,32 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       else{
         likeClass="show";
       }
+      // Build the markup applying appropriate css classes
+      // Call javascript method on icon click event to like or unlike the component
+      // Put a common area to show no of likes for the coponent
       return(
         <div className={styles.rcorner}>
           <div id="likeIcon" className={likeClass}>
             <p>
-              <span className={styles.favLbl}>Like it! </span>
+              <span className={styles.topAlign}>Like it! </span>
               <a href={"javascript:SetLike(true,'"+this.props.inventoryListName+"',"+this.id+")"}>
                 <img id="imgLike" className={styles.imgIcon}
                   src="/sites/SPMarketPlace/Style%20Library/Images/like.png"></img>
               </a>
-              
             </p>
           </div>
           <div  id="dislikeIcon" className={unlikeClass}>
             <p >
-              <span className={styles.favLbl}>Unlike it! </span>
+              <span className={styles.topAlign}>Unlike it! </span>
               <a href={"javascript:SetLike(false,'"+this.props.inventoryListName+"',"+this.id+")"}>
                 <img id="imgLike"  className={styles.imgIcon}
                   src="/sites/SPMarketPlace/Style%20Library/Images/dislike.png"></img>
               </a>
-              
             </p>
           </div>
-          <span className={styles.favLbl}> Total Likes: </span><span className={styles.favLbl} id="likeCount">{this.state.item.LikesCount}</span>
+          <span className={styles.topAlign}> Total Likes: </span><span className={styles.topAlign} id="likeCount">{this.state.item.LikesCount}</span>
        </div>
       );
-    
   }
 
   // Build and render the final markupo to show on the page
@@ -300,8 +308,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 <div>
                   <br />
                   <div id="divDemoUrl">
-                    {this.renderDemoLink()}
-                                        
+                    {this.renderDemoLink()}          
                   </div>
                   <br />
                   <div id="dicAdditionalResourcesHeader">
