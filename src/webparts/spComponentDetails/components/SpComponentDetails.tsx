@@ -216,6 +216,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   private renderFavouriteImage() {
     // Get user's login name without membership detials part
     var userLoginName = this.state.currentUser.LoginName.split(/[| ]+/).pop();
+    // Determine the favourite image url
+    var siteUrl = this.props.siteurl;
+    var favActiveImgUrl = siteUrl + "/Style%20Library/Images/if_star-add_44384.png";
+    var favInactiveImgUrl = siteUrl + "/Style%20Library/Images/if_Star%20On_58612.png";
 
     if (this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1) {
       // Markup if user has already set the component as favourite
@@ -223,7 +227,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         <p className={styles.rcornerDisabled} id="pFavInactive">
           <span className={styles.topAlign}>Add to favourite </span>
           <img id="imgFav"
-            src="/sites/spmarketplace/Style%20Library/Images/if_Star%20On_58612.png">
+            src= {favInactiveImgUrl}>
           </img>
         </p>
       );
@@ -235,7 +239,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <span className={styles.topAlign}>Add to favourite </span>
           <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.id + "', 'imgFav');"}>
             <img id="imgFav"
-              src="/sites/spmarketplace/Style%20Library/Images/if_star-add_44384.png"></img>
+              src={favActiveImgUrl}></img>
           </a>
         </p>
       );
@@ -245,6 +249,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // Return different markup when user has already likes the component
   // and different markup when user is yet to like the component
   private renderLike() {
+     // Determine like image url
+     var siteUrl = this.props.siteurl;
+     var likeImgUrl = siteUrl + "/Style%20Library/Images/like.png";
+
     // Initially hide both like and unlike divs
     var likeClass = "hide";
     var unlikeClass = "hide";
@@ -265,7 +273,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <span className={styles.topAlign}>Like it! </span>
           <a href={"javascript:SetLike(true,'" + this.props.inventoryListName + "'," + this.id + ")"}>
             <img id="imgLike" className={styles.imgIcon}
-              src="/sites/SPMarketPlace/Style%20Library/Images/like.png"></img>
+              src={likeImgUrl}></img>
           </a>
           <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForLike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
         </p>
@@ -273,11 +281,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <span className={styles.topAlign}>Unlike it! </span>
           <a href={"javascript:SetLike(false,'" + this.props.inventoryListName + "'," + this.id + ")"}>
             <img id="imgLike" className={styles.imgIcon}
-              src="/sites/SPMarketPlace/Style%20Library/Images/like.png"></img>
+              src={likeImgUrl}></img>
           </a>
           <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForUnlike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
         </p>
-
       </div>
     );
   }
