@@ -36,7 +36,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     pnp.sp.web.lists.getByTitle(iconListName).items
     .select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder")
     .orderBy("QuickLinkOrder", true)
-    .filter(`ItemStatus eq 'Active'`)
+    .filter(`ItemStatus eq 'Active' and LinkType eq 'Navigation Link'`)
     .get()
     .then((items: any[]) => {
       // Local variable to store the relevant links
