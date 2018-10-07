@@ -13,6 +13,7 @@ import { IIconBasedNavigationProps } from './components/IIconBasedNavigationProp
 
 export interface IIconBasedNavigationWebPartProps {
   iconListName: string;
+  defaultImgUrl:string;
 }
 
 export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<IIconBasedNavigationWebPartProps> {
@@ -22,6 +23,7 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
       IconBasedNavigation,
       {
         iconListName: this.properties.iconListName,
+        defaultImgUrl: this.properties.defaultImgUrl,
         siteurl: this.context.pageContext.web.absoluteUrl
       }
     );
@@ -50,6 +52,9 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
               groupFields: [
                 PropertyPaneTextField('iconListName', {
                   label: strings.IconListNameFieldLabel
+                }),
+                PropertyPaneTextField('defaultImgUrl', {
+                  label: strings.DefaultImgUrl
                 })
               ]
             }

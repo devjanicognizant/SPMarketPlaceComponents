@@ -44,9 +44,16 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
       // Iterate throught eh list of items received from service call
       for(let item of items)
       {
-        // Only add the item having the linkurl and imageurl set
-        if(item.QuickLinkImage != null && item.QuickLinkUrl != null)
+        // Only add the item having linkurl set
+        if(item.QuickLinkUrl != null)
         {
+          // In case image url is not set, set the default image
+          if(item.QuickLinkImage == null)
+          {
+            let defaultImg:any={};
+            defaultImg.Url = this.props.siteurl + this.props.defaultImgUrl; 
+            item.QuickLinkImage = defaultImg;
+          }
           iconsRet.push(item);
         }
       }

@@ -20,7 +20,8 @@
     "description": { "default": "Icon based Navigation links would be shown" },
     "officeFabricIconFontName": "Page",
     "properties": {
-      "iconListName": "QuickLinks"
+      "iconListName": "QuickLinks",
+      "defaultImgUrl":"/Style%20Library/Images/default.png"
     }
   }]
 }
