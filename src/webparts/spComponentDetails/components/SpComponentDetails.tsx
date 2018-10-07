@@ -218,8 +218,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     var userLoginName = this.state.currentUser.LoginName.split(/[| ]+/).pop();
     // Determine the favourite image url
     var siteUrl = this.props.siteurl;
-    var favActiveImgUrl = siteUrl + "/Style%20Library/Images/if_star-add_44384.png";
-    var favInactiveImgUrl = siteUrl + "/Style%20Library/Images/if_Star%20On_58612.png";
+    var favActiveImgUrl = siteUrl + this.props.activeFavouriteImgUrl;
+    var favInactiveImgUrl = siteUrl + this.props.inactiveFavouriteImgUrl;
 
     if (this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1) {
       // Markup if user has already set the component as favourite
@@ -251,7 +251,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   private renderLike() {
      // Determine like image url
      var siteUrl = this.props.siteurl;
-     var likeImgUrl = siteUrl + "/Style%20Library/Images/like.png";
+     var likeActiveImgUrl = siteUrl + this.props.activeLikeImgUrl;
+     var likeInactiveImgUrl = siteUrl + this.props.inactiveLikeImgUrl;
 
     // Initially hide both like and unlike divs
     var likeClass = "hide";
@@ -273,7 +274,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <span className={styles.topAlign}>Like it! </span>
           <a href={"javascript:SetLike(true,'" + this.props.inventoryListName + "'," + this.id + ")"}>
             <img id="imgLike" className={styles.imgIcon}
-              src={likeImgUrl}></img>
+              src={likeActiveImgUrl}></img>
           </a>
           <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForLike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
         </p>
@@ -281,7 +282,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <span className={styles.topAlign}>Unlike it! </span>
           <a href={"javascript:SetLike(false,'" + this.props.inventoryListName + "'," + this.id + ")"}>
             <img id="imgLike" className={styles.imgIcon}
-              src={likeImgUrl}></img>
+              src={likeInactiveImgUrl}></img>
           </a>
           <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForUnlike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
         </p>

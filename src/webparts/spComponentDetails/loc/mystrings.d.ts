@@ -3,6 +3,10 @@ declare interface ISpComponentDetailsWebPartStrings {
   BasicGroupName: string;
   InventoryListNameFieldLabel: string;
   ArtifactsListNameFieldLabel: string;
+  ActiveFavouriteImgUrl: string;
+  InactiveFavouriteImgUrl: string;
+  ActiveLikeImgUrl: string;
+  InactiveLikeImgUrl: string;
 }
 
 declare module 'SpComponentDetailsWebPartStrings' {

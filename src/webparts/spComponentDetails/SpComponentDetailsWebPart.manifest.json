@@ -21,7 +21,11 @@
     "officeFabricIconFontName": "Page",
     "properties": {
       "inventoryListName": "Component Inventory",
-      "artifactsListName": "Component Artifacts"
+      "artifactsListName": "Component Artifacts",
+      "activeFavouriteImgUrl":"/Style%20Library/Images/if_star-add_44384.png",
+      "inactiveFavouriteImgUrl":"/Style%20Library/Images/if_Star%20On_58612.png",
+      "activeLikeImgUrl":"/Style%20Library/Images/like.png",
+      "inactiveLikeImgUrl":"/Style%20Library/Images/like.png"
     }
   }]
 }
