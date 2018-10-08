@@ -317,62 +317,68 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
-      <div className={styles.spComponentDetails}>
-        <Row className={styles.containerRow}>
-          <Column flexGrow={1} className={styles.left}>
-            <div>
-              <div id="divComponentTitle">
-                <h1>{escape(this.state.item.ComponentTitle)}</h1>
+      <div>
+      { 
+        (this.state && this.state.item && this.state.item.ComponentTitle !="")?
+        <div className={styles.spComponentDetails}>
+          <Row className={styles.containerRow}>
+            <Column flexGrow={1} className={styles.left}>
+              <div>
+                <div id="divComponentTitle">
+                  <h1>{escape(this.state.item.ComponentTitle)}</h1>
+                </div>
+                <div id="divShortDescription">
+                  <p>{escape(this.state.item.ShortDescription)}</p>
+                </div>
+                <div id="divComponentDescriptionContent">
+                  <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
+                </div>
+                <div id="divComponentImage">
+                  <img src={this.state.item.ComponentImage.Url} alt=""></img>
+                </div>
               </div>
-              <div id="divShortDescription">
-                <p>{escape(this.state.item.ShortDescription)}</p>
+            </Column>
+            <Column flexGrow={1} className={styles.middle}>
+            </Column>
+            <Column flexGrow={1} className={styles.right}>
+              <div>
+                <br />
+                <div id="divDemoUrl">
+                  {this.renderDemoLink()}
+                </div>
+                <br />
+                <div id="dicAdditionalResourcesHeader">
+                  <h2>
+                    Additional Resources
+                      </h2>
+                </div>
+                <div id="divAdditionalResources">
+                  <ul>
+                    {
+                      this.renderArtifacts()
+                    }
+                  </ul>
+                </div>
+                <br />
+                <div id="divComponentOwner">
+                  <p className={styles.rcorner}>
+                    <a href={'mailto:' + this.state.componentOwnerDetails.Email} className={styles.link}>Contact Component Owner</a>
+                  </p>
+                </div>
               </div>
-              <div id="divComponentDescriptionContent">
-                <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
-              </div>
-              <div id="divComponentImage">
-                <img src={this.state.item.ComponentImage.Url} alt=""></img>
-              </div>
-            </div>
-          </Column>
-          <Column flexGrow={1} className={styles.middle}>
-          </Column>
-          <Column flexGrow={1} className={styles.right}>
-            <div>
               <br />
-              <div id="divDemoUrl">
-                {this.renderDemoLink()}
+              <div id="divFav">
+                {this.renderFavouriteImage()}
               </div>
               <br />
-              <div id="dicAdditionalResourcesHeader">
-                <h2>
-                  Additional Resources
-                    </h2>
+              <div id="divLike">
+                {this.renderLike()}
               </div>
-              <div id="divAdditionalResources">
-                <ul>
-                  {
-                    this.renderArtifacts()
-                  }
-                </ul>
-              </div>
-              <br />
-              <div id="divComponentOwner">
-                <p className={styles.rcorner}>
-                  <a href={'mailto:' + this.state.componentOwnerDetails.Email} className={styles.link}>Contact Component Owner</a>
-                </p>
-              </div>
-            </div>
-            <br />
-            <div id="divFav">
-              {this.renderFavouriteImage()}
-            </div>
-            <br />
-            <div id="divLike">
-              {this.renderLike()}
-            </div>
-          </Column>
-        </Row>
+            </Column>
+          </Row>
+        </div>
+        :<div>Loading component details. Please wait...</div>
+      }
       </div>
     );
   }
