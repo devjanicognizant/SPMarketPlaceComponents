@@ -3,7 +3,7 @@ import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { Column, Row } from 'simple-flexbox';
-import pnp from 'sp-pnp-js';
+import pnp, { Item } from 'sp-pnp-js';
 import LogManager from '../../LogManager';
 
 // Interface representing the state of component details webpart
@@ -19,7 +19,7 @@ export interface ISpComponentDetailsState {
     "ComponentImage": { "Description": "", "Url": "" },
     "DemoUrl": { "Description": "", "Url": "" },
     "ComponentLimitations": "",
-    "ComponentOwner": { "Title": "", "UserName": "" },
+    "ComponentOwner": any,
     "ComponentReviewers": any[],
     "ArtifactsLocation": { "Description": "", "Url": "" },
     "ComponentFeatures": any[],
@@ -37,6 +37,8 @@ export interface ISpComponentDetailsState {
     "LoginName": string,
     "Title": string
   };
+  // Component owner details - required for fetching the email id
+  componentOwnerDetails:any;
 }
 // React enabled component class implementing property and state interfaces
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -53,7 +55,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentImage": { "Description": "", "Url": "" },
         "DemoUrl": { "Description": "", "Url": "" },
         "ComponentLimitations": "",
-        "ComponentOwner": { "Title": "", "UserName": "" },
+        "ComponentOwner": {},
         "ComponentReviewers": [],
         "ArtifactsLocation": { "Description": "", "Url": "" },
         "ComponentFeatures": [],
@@ -68,7 +70,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "Email": "",
         "LoginName": "",
         "Title": ""
-      }
+      },
+      componentOwnerDetails:{"Email":""}
     };
   }
   // To store the component id coming from query string
@@ -85,7 +88,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     var inventoryList = this.props.inventoryListName;
 
     // Get the user details
-    this.getUserDetails();
+    this.getCurrentUserDetails();
 
     // Get component id from query string
     this.id = window.location.search.split("ComponentID=")[1];
@@ -99,7 +102,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentImage"
         , "DemoUrl"
         , "ComponentLimitations"
-        , "ComponentOwner/Title", "ComponentOwner/UserName"
+        , "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id"
         , "ArtifactsLocation"
         , "ComponentReviewers/Title", "ComponentReviewers/UserName"
         , "ComponentFeatures/Title"
@@ -108,6 +111,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
       .then((data: any) => {
+        if(data.ComponentOwner.Id != null){
+          this.getCompOwnerDetails(data.ComponentOwner.Id);
+        }
         // When anyone is yet to like the component, LikesCount comes as null. 
         // Set it as 0 in case it is null
         if (data.LikesCount == null) {
@@ -195,7 +201,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   }
 
   // Make a service call to get the user details
-  private getUserDetails() {
+  private getCurrentUserDetails() {
     var reactHandler = this;
     pnp.sp.web.currentUser.get().then((user) => {
       reactHandler.setState({
@@ -207,7 +213,24 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       LogManager.logException(error
         , "Error occured while fetching current user details."
         , "Cpmponent Details"
-        , "getUserDetails");
+        , "getCurrentUserDetails");
+    });
+  }
+
+   // Make a service call to get component owner details by Id
+   private getCompOwnerDetails(ownerId) {
+    var reactHandler = this;
+    pnp.sp.web.siteUsers.getById(ownerId).get().then(function(result) {
+      reactHandler.setState({
+        // Set the returned user object to state
+        componentOwnerDetails : result
+      });
+    })
+    .catch((error) => {
+      LogManager.logException(error
+        , "Error occured while fetching component owner details."
+        , "Cpmponent Details"
+        , "getCompOwnerDetails");
     });
   }
 
@@ -336,7 +359,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <br />
               <div id="divComponentOwner">
                 <p className={styles.rcorner}>
-                  <a href={'mailto:' + this.state.item.ComponentOwner.UserName} className={styles.link}>Contact Component Owner</a>
+                  <a href={'mailto:' + this.state.componentOwnerDetails.Email} className={styles.link}>Contact Component Owner</a>
                 </p>
               </div>
             </div>

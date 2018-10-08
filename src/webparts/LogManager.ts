@@ -9,7 +9,7 @@ import {
 Logger.subscribe(new ConsoleListener());
 
 // Set the active log level as information
-Logger.activeLogLevel = LogLevel.Info;
+Logger.activeLogLevel = LogLevel.Error;
 
 // Helper class to manage exception, log etc
 export default class LogManager
@@ -19,17 +19,17 @@ export default class LogManager
         Logger.write("Component Name: " + componentName
                     +". Method Name: " + methodName
                     +". Message:" + msg
-                    +". Exception details are as below:", LogLevel.Error);
-        Logger.write(exception, LogLevel.Error);
+                    +". Error Message:" + exception.message, LogLevel.Error);
+        //Logger.write(exception, LogLevel.Error);
     }
 
     // Log any mesage
     public static logMessage(msg:string){
-        Logger.write(msg, LogLevel.Info);
+        Logger.write(msg, LogLevel.Error);
     }
 
     // Convert the object to json and log the same
     public static logObject(obj:any){
-        Logger.writeJSON(JSON.stringify(obj), LogLevel.Info);
+        Logger.writeJSON(JSON.stringify(obj), LogLevel.Error);
     }
-} 
+}
