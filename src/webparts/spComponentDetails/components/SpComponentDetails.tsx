@@ -4,6 +4,7 @@ import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import { Column, Row } from 'simple-flexbox';
 import pnp, { Item } from 'sp-pnp-js';
+import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
 
 // Interface representing the state of component details webpart
@@ -91,7 +92,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     this.getCurrentUserDetails();
 
     // Get component id from query string
-    this.id = window.location.search.split("ComponentID=")[1];
+    var queryParameters = new UrlQueryParameterCollection(window.location.href);
+    this.id= queryParameters.getValue("ComponentID");
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
