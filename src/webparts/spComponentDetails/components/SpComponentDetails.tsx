@@ -6,7 +6,6 @@ import { Column, Row } from 'simple-flexbox';
 import pnp, { Item } from 'sp-pnp-js';
 import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
-
 // Interface representing the state of component details webpart
 export interface ISpComponentDetailsState {
   // Artifact documents
@@ -29,7 +28,6 @@ export interface ISpComponentDetailsState {
     "FavoriteAssociates": "",
     "LikedById": any[],
     "LikesCount": number
-
   };
   // Hold current user details
   currentUser: {
