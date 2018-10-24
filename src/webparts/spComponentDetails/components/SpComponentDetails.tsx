@@ -94,6 +94,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     this.id= queryParameters.getValue("ComponentID");
+    this.id="4";
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))

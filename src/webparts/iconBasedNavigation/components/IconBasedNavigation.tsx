@@ -60,7 +60,9 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
       reactHandler.setState({ 
         // Set the icon list to the state
         icons: iconsRet
-      }); 
+      });
+
+      //$("#titleAreaBox").append($(".icons").detach());
     })
     .catch(error => {
       LogManager.logException(error
@@ -73,19 +75,21 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
   // Build and render the markup to the page
   public render(): React.ReactElement<IIconBasedNavigationProps> {
     return (
-      <div className={ styles.iconBasedNavigation }>
-        <Row className={styles.containerRow}> 
-          {this.state.icons.map((d, idx)=>{
-            return (
-                <Column key={idx}>
-                    <a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}>
-                    <img className={styles.imgIcon}
-                      alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> 
-                  </a>
-                </Column>);
-            })
-          }
-        </Row>
+      <div className="icons">
+        <div className={ styles.iconBasedNavigation }>
+          <Row className={styles.containerRow}> 
+            {this.state.icons.map((d, idx)=>{
+              return (
+                  <Column key={idx}>
+                      <a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}>
+                      <img className={styles.imgIcon}
+                        alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> 
+                    </a>
+                  </Column>);
+              })
+            }
+          </Row>
+        </div>
       </div>
     );
   }
