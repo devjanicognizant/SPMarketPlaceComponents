@@ -22,11 +22,8 @@ export interface ISpComponentDetailsState {
     "DemoUrl": { "Description": "", "Url": "" },
     "ComponentLimitations": "",
     "ComponentOwner": any,
-    "ComponentReviewers": any[],
     "ArtifactsLocation": { "Description": "", "Url": "" },
     "ComponentFeatures": any[],
-    "FavouriteAssociatesId": any[]
-    "FavouriteAssociates": any[],
     "FavoriteAssociates": "",
     "LikedById": any[],
     "LikesCount": number
@@ -57,11 +54,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DemoUrl": { "Description": "", "Url": "" },
         "ComponentLimitations": "",
         "ComponentOwner": {},
-        "ComponentReviewers": [],
         "ArtifactsLocation": { "Description": "", "Url": "" },
         "ComponentFeatures": [],
-        "FavouriteAssociatesId": [],
-        "FavouriteAssociates": [],
         "FavoriteAssociates": "",
         "LikedById": [],
         "LikesCount": 0
@@ -94,11 +88,11 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     this.id= queryParameters.getValue("ComponentID");
-    this.id="4";
+    //this.id="4";
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
-      .expand("ComponentOwner", "ComponentReviewers", "ComponentFeatures", "FavouriteAssociates", "LikedBy")
+      .expand("ComponentOwner", "ComponentFeatures", "LikedBy")
       .select("ComponentTitle"
         , "ComponentDescription"
         , "ShortDescription"
@@ -107,9 +101,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentLimitations"
         , "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id"
         , "ArtifactsLocation"
-        , "ComponentReviewers/Title", "ComponentReviewers/UserName"
         , "ComponentFeatures/Title"
-        , "FavouriteAssociatesId", "FavouriteAssociates/Title", "FavouriteAssociates/UserName", "FavouriteAssociates/Id"
         , "FavoriteAssociates"
         , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
