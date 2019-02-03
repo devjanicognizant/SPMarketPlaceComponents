@@ -75,22 +75,46 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
   // Build and render the markup to the page
   public render(): React.ReactElement<IIconBasedNavigationProps> {
     return (
-      <div className="icons">
-        <div className={ styles.iconBasedNavigation }>
-          <Row className={styles.containerRow}> 
+      // <div className="icons">
+      //   <div className={ styles.iconBasedNavigation }>
+      //     <Row className={styles.containerRow}> 
+      //       {this.state.icons.map((d, idx)=>{
+      //         return (
+      //             <Column key={idx}>
+      //                 <a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}>
+      //                 <img className={styles.imgIcon}
+      //                   alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> 
+      //               </a>
+      //             </Column>);
+      //         })
+      //       }
+      //     </Row>
+      //   </div>
+      // </div>
+      <div className="competency-container">
+			  <div className="content-container">
+          <div className="competency-header">
+            <h2>I View Components by Competency</h2>
+          </div>
+          <div className="competency-grids">
             {this.state.icons.map((d, idx)=>{
               return (
-                  <Column key={idx}>
-                      <a href={d.QuickLinkUrl.Url} title={d.QuickLinkTitle}>
-                      <img className={styles.imgIcon}
-                        alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url}></img> 
-                    </a>
-                  </Column>);
+                        <div className="competency-grid-size">
+                          <div className="competency-inner-grid">
+                            <img alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url} />
+                              <p></p><h3>{d.QuickLinkTitle}</h3><p></p>
+                              <p>Lorem ipsum is placeholder text commonly used in the graphic,print.</p>
+                              <p> Components:8.0</p>
+                          </div>
+                        </div>
+                   );
               })
-            }
-          </Row>
-        </div>
-      </div>
+                   
+             }
+           
+        </div>	
+			</div>
+		</div>
     );
   }
 }
