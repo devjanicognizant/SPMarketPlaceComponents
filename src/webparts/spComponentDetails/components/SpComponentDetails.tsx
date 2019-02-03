@@ -22,11 +22,8 @@ export interface ISpComponentDetailsState {
     "DemoUrl": { "Description": "", "Url": "" },
     "ComponentLimitations": "",
     "ComponentOwner": any,
-    "ComponentReviewers": any[],
     "ArtifactsLocation": { "Description": "", "Url": "" },
     "ComponentFeatures": any[],
-    "FavouriteAssociatesId": any[]
-    "FavouriteAssociates": any[],
     "FavoriteAssociates": "",
     "LikedById": any[],
     "LikesCount": number
@@ -40,6 +37,9 @@ export interface ISpComponentDetailsState {
   };
   // Component owner details - required for fetching the email id
   componentOwnerDetails:any;
+
+  // Inventory list Guid
+  inventoryListId: string;
 }
 // React enabled component class implementing property and state interfaces
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -57,11 +57,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "DemoUrl": { "Description": "", "Url": "" },
         "ComponentLimitations": "",
         "ComponentOwner": {},
-        "ComponentReviewers": [],
         "ArtifactsLocation": { "Description": "", "Url": "" },
         "ComponentFeatures": [],
-        "FavouriteAssociatesId": [],
-        "FavouriteAssociates": [],
         "FavoriteAssociates": "",
         "LikedById": [],
         "LikesCount": 0
@@ -72,7 +69,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "LoginName": "",
         "Title": ""
       },
-      componentOwnerDetails:{"Email":""}
+      componentOwnerDetails:{"Email":""},
+      inventoryListId:""
     };
   }
   // To store the component id coming from query string
@@ -91,14 +89,17 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get the user details
     this.getCurrentUserDetails();
 
+    // Get the inventory list Id and put it into state
+    this.getInventoryListId();
+
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     this.id= queryParameters.getValue("ComponentID");
-    this.id="4";
+    //this.id="4";
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
-      .expand("ComponentOwner", "ComponentReviewers", "ComponentFeatures", "FavouriteAssociates", "LikedBy")
+      .expand("ComponentOwner", "ComponentFeatures", "LikedBy")
       .select("ComponentTitle"
         , "ComponentDescription"
         , "ShortDescription"
@@ -107,9 +108,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentLimitations"
         , "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id"
         , "ArtifactsLocation"
-        , "ComponentReviewers/Title", "ComponentReviewers/UserName"
         , "ComponentFeatures/Title"
-        , "FavouriteAssociatesId", "FavouriteAssociates/Title", "FavouriteAssociates/UserName", "FavouriteAssociates/Id"
         , "FavoriteAssociates"
         , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
@@ -220,6 +219,24 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     });
   }
 
+  // Get the inventory list id and put it into state
+  private getInventoryListId(){
+    let list = pnp.sp.web.lists.getByTitle(this.props.inventoryListName);
+    var reactHandler = this;
+      list.get().then(l => {
+         reactHandler.setState({
+            // Set the list id to state object
+            inventoryListId: l.Id
+          });
+        })
+        .catch((error) => {
+            LogManager.logException(error
+              , "Error occured while fetching component inventory list Id"
+              , "Component Details"
+              , "getInventoryListId");
+          });
+  }
+
    // Make a service call to get component owner details by Id
    private getCompOwnerDetails(ownerId) {
     var reactHandler = this;
@@ -259,17 +276,25 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       );
     }
     else {
-      // Markup if user is yet to set the component as favourite
-      return (
-        <p className="rcorner" id="pFavActive">
-          <span className={styles.topAlign}>Add to favourite </span>
-          <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.id + "', 'imgFav');"}>
-            <img id="imgFav"
-              src={favActiveImgUrl}></img>
-          </a>
+      if(this.state.inventoryListId != ""){
+         // Markup if user is yet to set the component as favourite
+          return (
+            <p className="rcorner" id="pFavActive">
+              <span className={styles.topAlign}>Add to favourite </span>
+              <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.id + "', 'imgFav','" + this.state.inventoryListId + "');"}>
+                <img id="imgFav"
+                  src={favActiveImgUrl}></img>
+              </a>
+            </p>
+          );
+      }
+      else  return (
+        <p className="rcornerDisabled" id="pFavInactive">
+          ERROR!!
         </p>
       );
-    }
+      
+      }
   }
 
   // Return different markup when user has already likes the component
