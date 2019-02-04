@@ -34,7 +34,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     // The list is ordered by QuickLinkOrder column
     // Icons would be skipped if QuickLinkUrl or QuickLinkImage are not set
     pnp.sp.web.lists.getByTitle(iconListName).items
-    .select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder")
+    .select("QuickLinkTitle", "QuickLinkUrl","QuickLinkImage","QuickLinkOrder","LinkTarget","Description")
     .orderBy("QuickLinkOrder", true)
     .filter(`ItemStatus eq 'Active' and LinkType eq 'Navigation Link'`)
     .get()
@@ -103,8 +103,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
                           <div className="competency-inner-grid">
                             <img alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url} />
                               <p></p><h3>{d.QuickLinkTitle}</h3><p></p>
-                              <p>Lorem ipsum is placeholder text commonly used in the graphic,print.</p>
-                              <p> Components:8.0</p>
+                              <p>{d.Description}</p>
                           </div>
                         </div>
                    );
