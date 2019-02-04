@@ -100,7 +100,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
             {this.state.icons.map((d, idx)=>{
               return (
                         <div className="competency-grid-size">
-                          <a href={d.QuickLinkUrl.Url}>
+                          <a href={d.LinkTarget}>
                             <div className="competency-inner-grid">
                               <img alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url} />
                                 <p></p><h3>{d.QuickLinkTitle}</h3><p></p>
