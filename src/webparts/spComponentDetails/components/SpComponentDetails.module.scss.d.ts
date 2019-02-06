@@ -1,0 +1,24 @@
+declare const styles: {
+    spComponentDetails: string;
+    container: string;
+    hide: string;
+    left: string;
+    width60: string;
+    right: string;
+    middle: string;
+    containerRow: string;
+    rcorner: string;
+    rcornerDisabled: string;
+    link: string;
+    btnContainerDiv: string;
+    topAlign: string;
+    imgIcon: string;
+    column: string;
+    'ms-Grid': string;
+    title: string;
+    subTitle: string;
+    description: string;
+    button: string;
+    label: string;
+};
+export default styles;
