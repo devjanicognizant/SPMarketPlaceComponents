@@ -20,8 +20,8 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
 
   constructor(props: IHomeProps) {
     super(props);
-    this.state = { listItems: [],selectedFilter:"All",selectedOrderBy:"Latest" };
-    
+    this.state = { listItems: [],selectedFilter:"All",selectedOrderBy:"Latest", latestLnkCssClass:"active", likeLnkCssClass:"" };
+  
     
     this.uniqueId = Math.floor(Math.random() * 10000) + 1;
    // this._LoadFavourites=this._LoadFavourites.bind(this);
@@ -74,8 +74,8 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
           <nav>
             <div className="content content-container">
                 <ul className="latest_links">
-                  <li className="active"><a href="#" onClick={this.onLatest} >Latest Added</a></li>
-                  <li><a href="#" onClick={this.onLike}>Top Liked</a></li>
+                  <li className={this.state.latestLnkCssClass}><a href="#" onClick={this.onLatest} >Latest Added</a></li>
+                  <li className={this.state.likeLnkCssClass}><a href="#" onClick={this.onLike}>Top Liked</a></li>
                 </ul>
             </div>
           </nav>
@@ -172,9 +172,11 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
     );
   }
  public onLike = (): void => {
+    this.setState({ latestLnkCssClass:"", likeLnkCssClass:"active" });
     this._LoadFavourites("Most Liked");
   };
   public onLatest = (): void =>{
+    this.setState({ latestLnkCssClass:"active", likeLnkCssClass:"" });
     this._LoadFavourites("Latest");
   };
   /**

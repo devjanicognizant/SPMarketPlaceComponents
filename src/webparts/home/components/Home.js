@@ -23,9 +23,11 @@ var Home = (function (_super) {
     function Home(props) {
         var _this = _super.call(this, props) || this;
         _this.onLike = function () {
+            _this.setState({ latestLnkCssClass: "", likeLnkCssClass: "active" });
             _this._LoadFavourites("Most Liked");
         };
         _this.onLatest = function () {
+            _this.setState({ latestLnkCssClass: "active", likeLnkCssClass: "" });
             _this._LoadFavourites("Latest");
         };
         /**
@@ -92,7 +94,7 @@ var Home = (function (_super) {
                 LogManager.logException(e, "Error occured while load favourites.", "_LoadFilters", "ReactSlideSwiper");
             }
         };
-        _this.state = { listItems: [], selectedFilter: "All", selectedOrderBy: "Latest" };
+        _this.state = { listItems: [], selectedFilter: "All", selectedOrderBy: "Latest", latestLnkCssClass: "active", likeLnkCssClass: "" };
         _this.uniqueId = Math.floor(Math.random() * 10000) + 1;
         // this._LoadFavourites=this._LoadFavourites.bind(this);
         _this._LoadFilters = _this._LoadFilters.bind(_this);
@@ -136,9 +138,9 @@ var Home = (function (_super) {
             React.createElement("nav", null,
                 React.createElement("div", { className: "content content-container" },
                     React.createElement("ul", { className: "latest_links" },
-                        React.createElement("li", { className: "active" },
+                        React.createElement("li", { className: this.state.latestLnkCssClass },
                             React.createElement("a", { href: "#", onClick: this.onLatest }, "Latest Added")),
-                        React.createElement("li", null,
+                        React.createElement("li", { className: this.state.likeLnkCssClass },
                             React.createElement("a", { href: "#", onClick: this.onLike }, "Top Liked"))))),
             React.createElement("div", { className: "main-content" },
                 React.createElement("div", { className: "content-container" },
