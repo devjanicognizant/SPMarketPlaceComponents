@@ -162,13 +162,14 @@ var Home = (function (_super) {
                                                 " ",
                                                 listItem.title,
                                                 "  "),
-                                            React.createElement("p", null, listItem.shortDescription))),
+                                            React.createElement("p", null, listItem.shortDescription.length > 250 ? listItem.shortDescription.slice(0, 250) + "...." : listItem.shortDescription))),
                                     React.createElement("div", { className: "item-content-like-symbol" },
                                         React.createElement("a", { href: "#" },
                                             React.createElement("img", { src: likeImageUrl, id: "like-red" }))),
                                     React.createElement("div", { className: "item-content-likes-count" },
                                         listItem.likesCount,
-                                        " Likes")));
+                                        " ",
+                                        Number(listItem.likesCount) > 1 ? "Likes" : "Like")));
                         }))))));
     };
     return Home;

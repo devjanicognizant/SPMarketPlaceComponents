@@ -103,11 +103,11 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
                                   <div className="item-content-text">
                                     <a href={redirectUrl+"?ComponentID="+listItem.id}>
                                           <p className="item-p"> {listItem.title}  </p>
-                                          <p>{listItem.shortDescription}</p>
+                                          <p>{listItem.shortDescription.length>250?listItem.shortDescription.slice(0,250)+"....": listItem.shortDescription}</p>
                                     </a>
                                   </div>
                                   <div className="item-content-like-symbol"><a href="#"><img src={likeImageUrl} id="like-red" /></a></div>
-                                  <div className="item-content-likes-count">{listItem.likesCount} Likes</div>
+                                  <div className="item-content-likes-count">{listItem.likesCount} {Number(listItem.likesCount)>1?"Likes":"Like"}</div>
                                 </div>
                               </div>;
                     })}
