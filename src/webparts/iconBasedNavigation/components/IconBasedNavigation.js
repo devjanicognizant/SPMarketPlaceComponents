@@ -88,15 +88,13 @@ var IconBasedNavigation = (function (_super) {
         React.createElement("div", { className: "competency-container" },
             React.createElement("div", { className: "content-container" },
                 React.createElement("div", { className: "competency-header" },
-                    React.createElement("h2", null, "I View Components by Competency")),
+                    React.createElement("p", null, "I View Components by Competency")),
                 React.createElement("div", { className: "competency-grids" }, this.state.icons.map(function (d, idx) {
                     return (React.createElement("div", { className: "competency-grid-size" },
                         React.createElement("a", { href: d.LinkTarget },
                             React.createElement("div", { className: "competency-inner-grid" },
                                 React.createElement("img", { alt: d.QuickLinkTitle, src: d.QuickLinkImage.Url }),
-                                React.createElement("p", null),
-                                React.createElement("h3", null, d.QuickLinkTitle),
-                                React.createElement("p", null),
+                                React.createElement("p", { className: "competency-p" }, d.QuickLinkTitle),
                                 React.createElement("p", null, d.Description)))));
                 })))));
     };

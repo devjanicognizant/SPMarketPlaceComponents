@@ -94,7 +94,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
       <div className="competency-container">
 			  <div className="content-container">
           <div className="competency-header">
-            <h2>I View Components by Competency</h2>
+            <p>I View Components by Competency</p>
           </div>
           <div className="competency-grids">
             {this.state.icons.map((d, idx)=>{
@@ -103,7 +103,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
                           <a href={d.LinkTarget}>
                             <div className="competency-inner-grid">
                               <img alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url} />
-                                <p></p><h3>{d.QuickLinkTitle}</h3><p></p>
+                                <p className="competency-p">{d.QuickLinkTitle}</p>
                                 <p>{d.Description}</p>
                             </div>
                           </a>

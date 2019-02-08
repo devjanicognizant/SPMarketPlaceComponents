@@ -5,4 +5,5 @@ export declare class ListItem {
     componentCategory: string;
     modified: any;
     likesCount: any;
+    shortDescription: any;
 }

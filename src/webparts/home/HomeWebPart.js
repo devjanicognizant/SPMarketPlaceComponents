@@ -23,7 +23,8 @@ var HomeWebPart = (function (_super) {
     HomeWebPart.prototype.render = function () {
         var element = React.createElement(Home, {
             listService: new ListMock(),
-            swiperOptions: this.properties
+            swiperOptions: this.properties,
+            siteUrl: this.context.pageContext.web.absoluteUrl
         });
         ReactDom.render(element, this.domElement);
     };
@@ -131,7 +132,7 @@ var HomeWebPart = (function (_super) {
                                 }),
                                 PropertyPaneTextField('selectTop', {
                                     label: strings.SelectTop,
-                                    value: "5"
+                                    value: "10"
                                 }),
                                 PropertyPaneToggle('showCategoryFilter', {
                                     label: strings.ShowCategoryFilter,

@@ -44,7 +44,8 @@ export default class HomeWebPart extends BaseClientSideWebPart<IHomeWebPartProps
       Home,
       {
         listService: new ListMock(),
-        swiperOptions: this.properties
+        swiperOptions: this.properties,
+        siteUrl: this.context.pageContext.web.absoluteUrl
       }
     );
 
@@ -153,7 +154,7 @@ export default class HomeWebPart extends BaseClientSideWebPart<IHomeWebPartProps
                 }),
                 PropertyPaneTextField('selectTop', {
                   label: strings.SelectTop,
-                  value: "5"
+                  value: "10"
                 }),
                 PropertyPaneToggle('showCategoryFilter', {
                   label: strings.ShowCategoryFilter,

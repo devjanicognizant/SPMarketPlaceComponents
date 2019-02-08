@@ -151,22 +151,24 @@ var Home = (function (_super) {
                     React.createElement("div", { className: "items" }, this.state.listItems.length &&
                         this.state.listItems.map(function (listItem, i) {
                             var redirectUrl = _this.props.swiperOptions.redirectURL;
+                            // Get the siteurl from property
+                            var siteUrl = _this.props.siteUrl;
+                            var likeImageUrl = siteUrl + "/siteassets/images/like-red.png";
                             return React.createElement("div", { className: "item" },
                                 React.createElement("div", { className: "item-content" },
                                     React.createElement("div", { className: "item-content-text" },
                                         React.createElement("a", { href: redirectUrl + "?ComponentID=" + listItem.id },
-                                            React.createElement("p", null,
+                                            React.createElement("p", { className: "item-p" },
                                                 " ",
-                                                React.createElement("h3", null,
-                                                    " ",
-                                                    listItem.title,
-                                                    " "),
-                                                " "))),
+                                                listItem.title,
+                                                "  "),
+                                            React.createElement("p", null, listItem.shortDescription))),
                                     React.createElement("div", { className: "item-content-like-symbol" },
                                         React.createElement("a", { href: "#" },
-                                            React.createElement("img", { src: "images/like-red.png", id: "like-red" }))),
+                                            React.createElement("img", { src: likeImageUrl, id: "like-red" }))),
                                     React.createElement("div", { className: "item-content-likes-count" },
-                                        React.createElement("a", { href: "#" }, "Count"))));
+                                        listItem.likesCount,
+                                        " Likes")));
                         }))))));
     };
     return Home;

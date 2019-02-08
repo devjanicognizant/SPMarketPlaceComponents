@@ -95,16 +95,19 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
                  {this.state.listItems.length &&
                     this.state.listItems.map((listItem, i) => {
                       var redirectUrl : string =  this.props.swiperOptions.redirectURL;
+                      // Get the siteurl from property
+                      var siteUrl = this.props.siteUrl;
+                      var likeImageUrl = siteUrl + "/siteassets/images/like-red.png";
                       return   <div className="item">
                                 <div className="item-content">
                                   <div className="item-content-text">
                                     <a href={redirectUrl+"?ComponentID="+listItem.id}>
-                                          <p> <h3> {listItem.title} </h3> </p>
-                                          {/*<p>Lorem Epsum is the placeholder text commonly used in the  graphic, print.</p>*/}
+                                          <p className="item-p"> {listItem.title}  </p>
+                                          <p>{listItem.shortDescription}</p>
                                     </a>
                                   </div>
-                                  <div className="item-content-like-symbol"><a href="#"><img src="images/like-red.png" id="like-red" /></a></div>
-                                  <div className="item-content-likes-count"><a href="#">Count</a></div>
+                                  <div className="item-content-like-symbol"><a href="#"><img src={likeImageUrl} id="like-red" /></a></div>
+                                  <div className="item-content-likes-count">{listItem.likesCount} Likes</div>
                                 </div>
                               </div>;
                     })}

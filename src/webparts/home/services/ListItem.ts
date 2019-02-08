@@ -6,4 +6,5 @@ export class ListItem {
     public componentCategory:string;
     public modified:any;
     public likesCount:any;
+    public shortDescription: any;
 }
