@@ -7,4 +7,5 @@ export class ListItem {
     public modified:any;
     public likesCount:any;
     public shortDescription: any;
+    public likedById:any[];
 }

@@ -6,4 +6,7 @@ import { ListItem } from "./ListItem";
  */
 export interface IListServce {
     getAll(options): Promise<Array<ListItem>>;
+    getCurrentUserDetails(): Promise<any>;
+    setLikes(listTitle,itemIany,likedByUsers,likesCount, currentUserId):Promise<any>;
+    setFavourites(listTitle:string,itemId:number,favouritesAssociates:any[], currentUserId: any):any;
 }

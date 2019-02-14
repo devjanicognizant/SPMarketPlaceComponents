@@ -20,7 +20,19 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
 
   constructor(props: IHomeProps) {
     super(props);
-    this.state = { listItems: [],selectedFilter:"All",selectedOrderBy:"Latest", latestLnkCssClass:"active", likeLnkCssClass:"" };
+    this.state = { 
+      listItems: []
+    ,selectedFilter:"All"
+    ,selectedOrderBy:"Latest"
+    , latestLnkCssClass:"active"
+    , likeLnkCssClass:""
+     ,currentUser: {
+        "Id": 0,
+        "Email": "",
+        "LoginName": "",
+        "Title": ""
+      }
+    };
   
     
     this.uniqueId = Math.floor(Math.random() * 10000) + 1;
@@ -32,9 +44,9 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
             _filterArray1.push({key:"All",text:"All"});
           }
   }
- 
+ private inputSearch: HTMLButtonElement;
   public componentDidMount(): void {
-
+    this.getCurrentUserDetails()
     this.props.listService.getAll(this.props.swiperOptions).then((result: Array<ListItem>) => {
       if(_items.length < 1)
       {        
@@ -61,12 +73,66 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
        
       this.setState({ listItems: _temp, selectedFilter:"All",selectedOrderBy:"Latest" });
       //this.setSwiper();
+      this.inputSearch.focus();
     });
+  }
+
+  public componentDidUpdate(): void {
+    this.inputSearch.focus();
+  }
+
+  // Make a service call to get the user details
+  private getCurrentUserDetails() {
+    this.props.listService.getCurrentUserDetails().then((result: any) => {
+      this.setState({
+        // Set the returned user object to state
+        currentUser: result
+      });
+    });
+     
+  }
+
+  // Return different markup when user has already likes the component
+  // and different markup when user is yet to like the component
+  private renderLike(item, index) {
+     // Determine like image url
+     var siteUrl = this.props.siteUrl;
+     var likeActiveImgUrl = siteUrl +"/siteassets/images/like-red.png";
+     var likeInactiveImgUrl = siteUrl +"/siteassets/images/unlike-red.png";
+
+    // Initially hide both like and unlike divs
+    var likeClass = "hide";
+    var unlikeClass = "hide";
+    // Set the css class based on the status whether user liked the component or not
+    if (item.likedById != null
+      && item.likedById.indexOf(this.state.currentUser.Id) != -1) {
+      unlikeClass = "show";
+      
+    }
+    else {
+      likeClass = "show";
+    }
+    // Build the markup applying appropriate css classes
+    // Call javascript method on icon click event to like or unlike the component
+    // Put a common area to show no of likes for the coponent
+    return (
+      <div className="item-content-like-symbol">
+        <div className={likeClass} id={"divLike"+index}>
+          <a href="#" onClick={this.onSetLike.bind(this,index, item)}>
+            <img src={likeActiveImgUrl} id="like-red" />
+          </a>
+        </div>
+        <div className={unlikeClass} id={"divUnlike"+index}>
+          <a href="#" onClick={this.onSetLike.bind(this,index, item)}>
+            <img src={likeInactiveImgUrl} id="unlike-red" />
+          </a>
+        </div>
+      </div>
+    );
   }
 
 /**
  * This method renders the swiper using properteis
- * Card component will be used inside this to render images. 
  */
   public render(): React.ReactElement<IHomeProps> {
     return (
@@ -74,8 +140,8 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
           <nav>
             <div className="content content-container">
                 <ul className="latest_links">
-                  <li className={this.state.latestLnkCssClass}><a href="#" onClick={this.onLatest} >Latest Added</a></li>
-                  <li className={this.state.likeLnkCssClass}><a href="#" onClick={this.onLike}>Top Liked</a></li>
+                  <li className={this.state.latestLnkCssClass}><a href="#" onClick={this.onLatestSort} >Latest Added</a></li>
+                  <li className={this.state.likeLnkCssClass}><a href="#" onClick={this.onLikeSort}>Top Liked</a></li>
                 </ul>
             </div>
           </nav>
@@ -89,25 +155,26 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
                         defaultSelectedKey="All"                        
                         options={_filterArray1}
                       />   
+                      <input ref={(input) => { this.inputSearch = input; }} className="hide-on-ui" type="button" />
                 </div>
               </div>
+              
               <div className="items">
                  {this.state.listItems.length &&
-                    this.state.listItems.map((listItem, i) => {
+                    this.state.listItems.map((listItem, index) => {
                       var redirectUrl : string =  this.props.swiperOptions.redirectURL;
                       // Get the siteurl from property
-                      var siteUrl = this.props.siteUrl;
-                      var likeImageUrl = siteUrl + "/siteassets/images/like-red.png";
                       return   <div className="item">
                                 <div className="item-content">
                                   <div className="item-content-text">
                                     <a href={redirectUrl+"?ComponentID="+listItem.id}>
-                                          <p className="item-p"> {listItem.title}  </p>
-                                          <p>{listItem.shortDescription.length>250?listItem.shortDescription.slice(0,250)+"....": listItem.shortDescription}</p>
+                                          <p className="item-p"> {listItem.title.length>35?listItem.title.slice(0,35)+"...": listItem.title}  </p>
+                                          <p>{listItem.shortDescription.length>140?listItem.shortDescription.slice(0,140)+"...": listItem.shortDescription}</p>
                                     </a>
                                   </div>
-                                  <div className="item-content-like-symbol"><a href="#"><img src={likeImageUrl} id="like-red" /></a></div>
-                                  <div className="item-content-likes-count">{listItem.likesCount} {Number(listItem.likesCount)>1?"Likes":"Like"}</div>
+                                  {this.renderLike(listItem, index)}
+                                  <div className="item-content-likes-count" id={"divLikeCount"+index}>{listItem.likesCount} {Number(listItem.likesCount)>1?"Likes":"Like"}</div>
+                                  
                                 </div>
                               </div>;
                     })}
@@ -174,13 +241,31 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
       </div>     
     );
   }
- public onLike = (): void => {
-    this.setState({ latestLnkCssClass:"", likeLnkCssClass:"active" });
-    this._LoadFavourites("Most Liked");
+  public onSetLike = (index, item): void => {
+    // _items[index].likesCount = _items[index].likesCount +1;
+    //  this.setState({ listItems: _items});
+    //this._LoadFavourites(this.state.selectedOrderBy);
+    var likedBy = (item.likedById != null)?item.likedById.results:[];
+    this.props.listService.setLikes(this.props.swiperOptions.sourceList,item.id, item.likedById, item.likesCount, this.state.currentUser.Id).then((result: any) => {
+      _items[index].likedById = (result.LikedById != null && result.LikedById.results != null)?result.LikedById.results:result.LikedById;
+      _items[index].likesCount = result.LikesCount;
+       this.setState({ listItems: _items});
+       this._LoadFavourites(this.state.selectedOrderBy);
+    });
   };
-  public onLatest = (): void =>{
-    this.setState({ latestLnkCssClass:"active", likeLnkCssClass:"" });
+   public onSetUnlike = (index, item): void => {
+    // _items[index].likesCount = _items[index].likesCount -1;
+   
+  };
+ public onLikeSort = (): void => {
+   
+    this._LoadFavourites("Most Liked");
+     this.setState({ latestLnkCssClass:"", likeLnkCssClass:"active" });
+  };
+  public onLatestSort = (): void =>{
+   
     this._LoadFavourites("Latest");
+     this.setState({ latestLnkCssClass:"active", likeLnkCssClass:"" });
   };
   /**
    * This method sort datasource and set it in state according to selected criteria.
@@ -254,6 +339,7 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
         _temp=_temp.slice(0,numberOfTopRecords);
         this.setState({ listItems: _temp,selectedFilter:item.text });
         //this.setSwiper();  
+        this.inputSearch.focus();
     }
     catch(e) 
     {

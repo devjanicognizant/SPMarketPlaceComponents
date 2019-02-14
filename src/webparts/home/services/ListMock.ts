@@ -11,17 +11,16 @@ export class ListMock implements IListServce {
     public getAll(options): Promise<Array<ListItem>> {
         //Logger.subscribe(new ConsoleListener());
       return new Promise<Array<ListItem>>((resolve:any) => { 
-            const sliderdata: Array<ListItem>  = [
-            ];        
+            const sliderdata: Array<ListItem>  = [];        
             pnp.sp.web.lists.getByTitle(options.sourceList).items
             .filter("ComponentStatus eq 'Approved'")
-            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory0/Title",'LikesCount','ShortDescription')
-            .expand("ComponentCategory0")
+            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory0/Title",'LikesCount','ShortDescription', "LikedBy/Id", "LikedById")
+            .expand("ComponentCategory0", "LikedBy")
             .orderBy(options.orderBy,options.isAsending)            
             .get().then( r => 
             {                                     
                     for(let i=0;i<r.length;i++){
-                        sliderdata.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory0"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription});       
+                        sliderdata.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory0"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription,likedById:r[i].LikedById});       
                     }                              
                     resolve(sliderdata);                        
             })
@@ -30,5 +29,74 @@ export class ListMock implements IListServce {
             });  
             });   
     }
-}
+     // Make a service call to get the user details
+    public getCurrentUserDetails() {
+        return new Promise<any>((resolve:any) => { 
+            pnp.sp.web.currentUser.get().then((user) => {
+                resolve(user);
+            })
+            .catch((error) => {
+            LogManager.logException(error
+                , "Error occured while fetching current user details."
+                , "ListMock"
+                , "getCurrentUserDetails");
+            });
+        });
+    }
+    public async updateListItem(listTitle:string,itemId:number,itemInformation:any)
+    {
+        let list = pnp.sp.web.lists.getByTitle(listTitle);
+        await list.items.getById(itemId)
+        .update(itemInformation)
+        .then(i => {console.log(i);})
+        .catch((error)=>{console.log(error)})
+    }
+
+    public setLikes(listTitle:any,itemId:any,likedByUsers:any[],likesCount:any, currentUserId: any):any
+    {
+         return new Promise<any>((resolve:any) => { 
+            let newLikedBy:any[]=[];
+
+            if(likedByUsers != undefined && likedByUsers.filter(a=> a == currentUserId).length >0)
+            { 
+                newLikedBy=likedByUsers.filter( a => a != currentUserId)
+                likesCount=(likesCount != null && likesCount >0)?likesCount-1:0;
+            }
+            else
+            {
+                newLikedBy=(likedByUsers != undefined)?likedByUsers:[]
+                newLikedBy.push(currentUserId)
+                likesCount=(likesCount != null && likesCount >0)?likesCount+1:1;
+            }
+            let itemInformation=
+            {
+                LikedById:{results:newLikedBy},
+                LikesCount:likesCount
+            };
+            this.updateListItem(listTitle,itemId,itemInformation);
+            resolve(itemInformation);
+         });
+    } 
+
+    public setFavourites(listTitle:string,itemId:number,favouritesAssociates:any[], currentUserId: any):any
+    {
+        let newfavouriteAssociates:any[]=[];
+        if(favouritesAssociates != undefined && favouritesAssociates.filter(a=> a == currentUserId).length >0)
+        { 
+            newfavouriteAssociates=newfavouriteAssociates.filter(a => a != currentUserId)
+        }
+        else
+        {
+            newfavouriteAssociates=(newfavouriteAssociates != undefined)?newfavouriteAssociates:[]
+            newfavouriteAssociates.push(currentUserId)
+        }
+        let itemInformation=
+        { 
+            FavouritesAssociates:newfavouriteAssociates.toString()
+        };
+        this.updateListItem(listTitle,itemId,itemInformation);
+        return itemInformation;
+    } 
+  }
+
   

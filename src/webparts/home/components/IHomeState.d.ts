@@ -5,4 +5,5 @@ export interface IHomeState {
     selectedOrderBy: string;
     latestLnkCssClass: string;
     likeLnkCssClass: string;
+    currentUser: any;
 }

@@ -35,7 +35,7 @@ var IconBasedNavigation = (function (_super) {
         // The list is ordered by QuickLinkOrder column
         // Icons would be skipped if QuickLinkUrl or QuickLinkImage are not set
         pnp.sp.web.lists.getByTitle(iconListName).items
-            .select("QuickLinkTitle", "QuickLinkUrl", "QuickLinkImage", "QuickLinkOrder", "LinkTarget", "Description")
+            .select("QuickLinkTitle", "QuickLinkUrl", "QuickLinkImage", "QuickLinkOrder", "LinkTarget", "LinkDescription")
             .orderBy("QuickLinkOrder", true)
             .filter("ItemStatus eq 'Active' and LinkType eq 'Navigation Link'")
             .get()
@@ -95,7 +95,7 @@ var IconBasedNavigation = (function (_super) {
                             React.createElement("div", { className: "competency-inner-grid" },
                                 React.createElement("img", { alt: d.QuickLinkTitle, src: d.QuickLinkImage.Url }),
                                 React.createElement("p", { className: "competency-p" }, d.QuickLinkTitle),
-                                React.createElement("p", null, d.Description)))));
+                                React.createElement("p", null, d.LinkDescription)))));
                 })))));
     };
     return IconBasedNavigation;

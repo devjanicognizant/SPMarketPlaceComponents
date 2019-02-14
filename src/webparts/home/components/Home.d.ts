@@ -8,14 +8,19 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
     private uniqueId;
     constructor(props: IHomeProps);
     componentWillMount(): void;
+    private inputSearch;
     componentDidMount(): void;
+    componentDidUpdate(): void;
+    private getCurrentUserDetails();
+    private renderLike(item, index);
     /**
      * This method renders the swiper using properteis
-     * Card component will be used inside this to render images.
      */
     render(): React.ReactElement<IHomeProps>;
-    onLike: () => void;
-    onLatest: () => void;
+    onSetLike: (index: any, item: any) => void;
+    onSetUnlike: (index: any, item: any) => void;
+    onLikeSort: () => void;
+    onLatestSort: () => void;
     /**
      * This method sort datasource and set it in state according to selected criteria.
      * e.g. Most Liked - sort sccording to likes column desending

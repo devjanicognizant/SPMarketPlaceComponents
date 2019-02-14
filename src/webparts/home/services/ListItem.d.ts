@@ -6,4 +6,5 @@ export declare class ListItem {
     modified: any;
     likesCount: any;
     shortDescription: any;
+    likedById: any[];
 }
