@@ -1,4 +1,4 @@
-import { IListServce } from "../services/IListService";
+import { IListServce } from "../../commonServices/IListService";
 import { IHomeWebPartProps } from "../HomeWebPart";
 /*
  * Interface declaration of swiper properties

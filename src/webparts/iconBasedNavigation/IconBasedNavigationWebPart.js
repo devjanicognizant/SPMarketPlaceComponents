@@ -14,6 +14,7 @@ import { Version } from '@microsoft/sp-core-library';
 import { BaseClientSideWebPart, PropertyPaneTextField } from '@microsoft/sp-webpart-base';
 import * as strings from 'IconBasedNavigationWebPartStrings';
 import IconBasedNavigation from './components/IconBasedNavigation';
+import { ListMock } from '../commonServices/ListMock';
 var IconBasedNavigationWebPart = (function (_super) {
     __extends(IconBasedNavigationWebPart, _super);
     function IconBasedNavigationWebPart() {
@@ -23,7 +24,9 @@ var IconBasedNavigationWebPart = (function (_super) {
         var element = React.createElement(IconBasedNavigation, {
             iconListName: this.properties.iconListName,
             defaultImgUrl: this.properties.defaultImgUrl,
-            siteurl: this.context.pageContext.web.absoluteUrl
+            siteurl: this.context.pageContext.web.absoluteUrl,
+            listService: new ListMock(),
+            inventoryListName: this.properties.inventoryListName
         });
         ReactDom.render(element, this.domElement);
     };
@@ -53,6 +56,9 @@ var IconBasedNavigationWebPart = (function (_super) {
                                 }),
                                 PropertyPaneTextField('defaultImgUrl', {
                                     label: strings.DefaultImgUrl
+                                }),
+                                PropertyPaneTextField('inventoryListName', {
+                                    label: strings.InventoryListNameFieldLabel
                                 })
                             ]
                         }

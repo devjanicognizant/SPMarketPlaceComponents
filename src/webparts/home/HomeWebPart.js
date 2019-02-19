@@ -14,7 +14,7 @@ import { Version } from '@microsoft/sp-core-library';
 import { BaseClientSideWebPart, PropertyPaneTextField, PropertyPaneToggle, } from '@microsoft/sp-webpart-base';
 import * as strings from 'HomeWebPartStrings';
 import Home from './components/Home';
-import { ListMock } from './services/ListMock';
+import { ListMock } from '../commonServices/ListMock';
 var HomeWebPart = (function (_super) {
     __extends(HomeWebPart, _super);
     function HomeWebPart() {

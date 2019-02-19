@@ -16,9 +16,17 @@ var IconBasedNavigation = (function (_super) {
     __extends(IconBasedNavigation, _super);
     function IconBasedNavigation(props, state) {
         var _this = _super.call(this, props) || this;
+        _this.getCompCount = function (category) {
+            var countfiltered = this.state.listItems.filter(function (element) {
+                return element.componentCategory == category;
+            }).length;
+            console.log(countfiltered);
+            return countfiltered;
+        };
         // Icon lists to be part of the state
         _this.state = {
-            icons: []
+            icons: [],
+            listItems: []
         };
         return _this;
     }
@@ -31,6 +39,9 @@ var IconBasedNavigation = (function (_super) {
         var siteUrl = this.props.siteurl;
         // Get icon configuration list name from property
         var iconListName = this.props.iconListName;
+        this.props.listService.getAllRefByCategory(this.props.inventoryListName).then(function (result) {
+            _this.setState({ listItems: result });
+        });
         // Service call to fetch active set of icon list from list
         // The list is ordered by QuickLinkOrder column
         // Icons would be skipped if QuickLinkUrl or QuickLinkImage are not set
@@ -68,6 +79,7 @@ var IconBasedNavigation = (function (_super) {
     };
     // Build and render the markup to the page
     IconBasedNavigation.prototype.render = function () {
+        var _this = this;
         return (
         // <div className="icons">
         //   <div className={ styles.iconBasedNavigation }>
@@ -95,7 +107,10 @@ var IconBasedNavigation = (function (_super) {
                             React.createElement("div", { className: "competency-inner-grid" },
                                 React.createElement("img", { alt: d.QuickLinkTitle, src: d.QuickLinkImage.Url }),
                                 React.createElement("p", { className: "competency-p" }, d.QuickLinkTitle),
-                                React.createElement("p", null, d.LinkDescription)))));
+                                React.createElement("p", null, d.LinkDescription),
+                                React.createElement("p", null,
+                                    "Component: ",
+                                    _this.getCompCount(d.QuickLinkTitle))))));
                 })))));
     };
     return IconBasedNavigation;

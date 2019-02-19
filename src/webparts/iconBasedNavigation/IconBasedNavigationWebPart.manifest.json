@@ -21,7 +21,8 @@
     "officeFabricIconFontName": "Page",
     "properties": {
       "iconListName": "QuickLinks",
-      "defaultImgUrl":"/Style%20Library/Images/default.png"
+      "defaultImgUrl":"/Style%20Library/Images/default.png",
+      "inventoryListName": "Component Inventory"
     }
   }]
 }

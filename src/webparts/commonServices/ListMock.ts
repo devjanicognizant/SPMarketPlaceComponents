@@ -1,7 +1,7 @@
 import { ListItem } from "./ListItem";
 import { IListServce } from "./IListService";
 import pnp from "sp-pnp-js";
-import LogManager from '../../LogManager';
+import LogManager from '../LogManager';
 
 export class ListMock implements IListServce {
 
@@ -11,21 +11,42 @@ export class ListMock implements IListServce {
     public getAll(options): Promise<Array<ListItem>> {
         //Logger.subscribe(new ConsoleListener());
       return new Promise<Array<ListItem>>((resolve:any) => { 
-            const sliderdata: Array<ListItem>  = [];        
+            const data: Array<ListItem>  = [];        
             pnp.sp.web.lists.getByTitle(options.sourceList).items
-            .filter("ComponentStatus eq 'Approved'")
-            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory0/Title",'LikesCount','ShortDescription', "LikedBy/Id", "LikedById")
-            .expand("ComponentCategory0", "LikedBy")
+            .filter("ComponentStatus eq 'Active'")
+            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory/Title",'LikesCount','ShortDescription', "LikedBy/Id", "LikedById")
+            .expand("ComponentCategory", "LikedBy")
             .orderBy(options.orderBy,options.isAsending)            
             .get().then( r => 
             {                                     
                     for(let i=0;i<r.length;i++){
-                        sliderdata.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory0"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription,likedById:r[i].LikedById});       
+                        data.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription,likedById:r[i].LikedById});       
                     }                              
-                    resolve(sliderdata);                        
+                    resolve(data);                        
             })
             .catch((e)=> {      
                 LogManager.logException(e,"Error occured while fetching data from sharepoint list.","getAll","ListMock");                              
+            });  
+            });   
+    }
+
+    public getAllRefByCategory(sourceList): Promise<Array<ListItem>> {
+        //Logger.subscribe(new ConsoleListener());
+      return new Promise<Array<ListItem>>((resolve:any) => { 
+            const data: Array<ListItem>  = [];        
+            pnp.sp.web.lists.getByTitle(sourceList).items
+            .filter("ComponentStatus eq 'Active'")
+            .select("ID","ComponentCategory/Title")
+            .expand("ComponentCategory")      
+            .get().then( r => 
+            {                                     
+                    for(let i=0;i<r.length;i++){
+                        data.push({id:r[i].ID,title:"",modified:"",imageUrl:"",componentCategory:(r[i]["ComponentCategory"]).Title,likesCount:"",shortDescription:"",likedById:[]});       
+                    }                              
+                    resolve(data);                        
+            })
+            .catch((e)=> {      
+                LogManager.logException(e,"Error occured while fetching data from sharepoint list.","getAllRefByCategory","ListMock");                              
             });  
             });   
     }

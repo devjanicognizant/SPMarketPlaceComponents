@@ -3,12 +3,15 @@ import styles from './IconBasedNavigation.module.scss';
 import { IIconBasedNavigationProps } from './IIconBasedNavigationProps';
 import { Column, Row } from 'simple-flexbox';
 import pnp  from 'sp-pnp-js';
+import { ListItem } from '../../commonServices/ListItem';
+
 
 import LogManager from '../../LogManager';
 
 // Represents the webpart state interface
 export interface IIconBasedNavigationState{
   icons:any[];
+  listItems: Array<ListItem>;
 } 
 // React enabled component class implementing property and state interfaces
 export default class IconBasedNavigation extends React.Component<IIconBasedNavigationProps, IIconBasedNavigationState> {
@@ -16,7 +19,8 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     super(props); 
     // Icon lists to be part of the state
     this.state = {
-      icons:[]
+        icons:[]
+        ,listItems:[]
     };
   } 
 
@@ -30,6 +34,10 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     // Get icon configuration list name from property
     var iconListName = this.props.iconListName;
 
+    this.props.listService.getAllRefByCategory(this.props.inventoryListName).then((result: Array<ListItem>) => {
+      this.setState({listItems: result});
+    });
+
     // Service call to fetch active set of icon list from list
     // The list is ordered by QuickLinkOrder column
     // Icons would be skipped if QuickLinkUrl or QuickLinkImage are not set
@@ -39,6 +47,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
     .filter(`ItemStatus eq 'Active' and LinkType eq 'Navigation Link'`)
     .get()
     .then((items: any[]) => {
+       
       // Local variable to store the relevant links
       let iconsRet: any[]=[];
       // Iterate throught eh list of items received from service call
@@ -61,7 +70,6 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
         // Set the icon list to the state
         icons: iconsRet
       });
-
       //$("#titleAreaBox").append($(".icons").detach());
     })
     .catch(error => {
@@ -70,6 +78,14 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
         ,"Icon Based Navigation"
         ,"componentDidMount");
     });
+  }
+
+  private getCompCount = function (category):any{
+    var countfiltered = this.state.listItems.filter(function(element){
+          return element.componentCategory == category;
+      }).length;
+      console.log(countfiltered);
+      return countfiltered;
   }
 
   // Build and render the markup to the page
@@ -97,7 +113,8 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
             <p>I View Components by Competency</p>
           </div>
           <div className="competency-grids">
-            {this.state.icons.map((d, idx)=>{
+            {
+              this.state.icons.map((d, idx)=>{
               return (
                         <div className="competency-grid-size">
                           <a href={d.LinkTarget}>
@@ -105,6 +122,7 @@ export default class IconBasedNavigation extends React.Component<IIconBasedNavig
                               <img alt={d.QuickLinkTitle} src={d.QuickLinkImage.Url} />
                                 <p className="competency-p">{d.QuickLinkTitle}</p>
                                 <p>{d.LinkDescription}</p>
+                                <p>Component: {this.getCompCount(d.QuickLinkTitle)}</p>
                             </div>
                           </a>
                         </div>

@@ -3,6 +3,7 @@ declare interface IIconBasedNavigationWebPartStrings {
   BasicGroupName: string;
   IconListNameFieldLabel: string;
   DefaultImgUrl: string;
+  InventoryListNameFieldLabel:string;
 }
 
 declare module 'IconBasedNavigationWebPartStrings' {

@@ -230,14 +230,14 @@ var Home = (function (_super) {
                                         React.createElement("a", { href: redirectUrl + "?ComponentID=" + listItem.id },
                                             React.createElement("p", { className: "item-p" },
                                                 " ",
-                                                listItem.title.length > 35 ? listItem.title.slice(0, 35) + "..." : listItem.title,
+                                                listItem.title.length > 25 ? listItem.title.slice(0, 25) + "..." : listItem.title,
                                                 "  "),
-                                            React.createElement("p", null, listItem.shortDescription.length > 140 ? listItem.shortDescription.slice(0, 140) + "..." : listItem.shortDescription))),
+                                            React.createElement("p", null, listItem.shortDescription.length > 120 ? listItem.shortDescription.slice(0, 120) + "..." : listItem.shortDescription))),
                                     _this.renderLike(listItem, index),
                                     React.createElement("div", { className: "item-content-likes-count", id: "divLikeCount" + index },
-                                        listItem.likesCount,
+                                        (listItem.likesCount != null && Number(listItem.likesCount) > 0) ? listItem.likesCount : "",
                                         " ",
-                                        Number(listItem.likesCount) > 1 ? "Likes" : "Like")));
+                                        (listItem.likesCount != null && Number(listItem.likesCount) > 0) ? Number(listItem.likesCount) > 1 ? "Likes" : "Like" : "")));
                         }))))));
     };
     return Home;

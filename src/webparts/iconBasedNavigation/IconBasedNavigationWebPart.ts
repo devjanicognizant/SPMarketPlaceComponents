@@ -10,10 +10,12 @@ import {
 import * as strings from 'IconBasedNavigationWebPartStrings';
 import IconBasedNavigation from './components/IconBasedNavigation';
 import { IIconBasedNavigationProps } from './components/IIconBasedNavigationProps';
+import { ListMock } from '../commonServices/ListMock';
 
 export interface IIconBasedNavigationWebPartProps {
   iconListName: string;
   defaultImgUrl:string;
+  inventoryListName: string;
 }
 
 export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<IIconBasedNavigationWebPartProps> {
@@ -24,7 +26,9 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
       {
         iconListName: this.properties.iconListName,
         defaultImgUrl: this.properties.defaultImgUrl,
-        siteurl: this.context.pageContext.web.absoluteUrl
+        siteurl: this.context.pageContext.web.absoluteUrl,
+        listService: new ListMock(),
+        inventoryListName: this.properties.inventoryListName
       }
     );
 
@@ -55,6 +59,9 @@ export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<II
                 }),
                 PropertyPaneTextField('defaultImgUrl', {
                   label: strings.DefaultImgUrl
+                }),
+                PropertyPaneTextField('inventoryListName', {
+                  label: strings.InventoryListNameFieldLabel
                 })
               ]
             }

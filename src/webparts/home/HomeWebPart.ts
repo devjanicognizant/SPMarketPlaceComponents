@@ -11,8 +11,8 @@ import {
 import * as strings from 'HomeWebPartStrings';
 import Home from './components/Home';
 import { IHomeProps } from './components/IHomeProps';
-import { IListServce } from './services/IListService';
-import { ListMock } from './services/ListMock';
+import { IListServce } from '../commonServices/IListService';
+import { ListMock } from '../commonServices/ListMock';
 
 export interface IHomeWebPartProps {
   // enableNavigation: boolean;

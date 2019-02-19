@@ -3,6 +3,7 @@ import { BaseClientSideWebPart, IPropertyPaneConfiguration } from '@microsoft/sp
 export interface IIconBasedNavigationWebPartProps {
     iconListName: string;
     defaultImgUrl: string;
+    inventoryListName: string;
 }
 export default class IconBasedNavigationWebPart extends BaseClientSideWebPart<IIconBasedNavigationWebPartProps> {
     render(): void;

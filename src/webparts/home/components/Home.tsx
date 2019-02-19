@@ -2,7 +2,7 @@ import * as React from 'react';
 import styles from './Home.module.scss';
 import { IHomeProps } from './IHomeProps';
 import { IHomeState } from './IHomeState';
-import { ListItem } from '../services/ListItem';
+import { ListItem } from '../../commonServices/ListItem';
 //import Card from './Card/Card';
 import { Dropdown, IDropdown, DropdownMenuItemType, IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 import './Dropdown.Basic.Example.scss';
@@ -168,12 +168,12 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
                                 <div className="item-content">
                                   <div className="item-content-text">
                                     <a href={redirectUrl+"?ComponentID="+listItem.id}>
-                                          <p className="item-p"> {listItem.title.length>35?listItem.title.slice(0,35)+"...": listItem.title}  </p>
-                                          <p>{listItem.shortDescription.length>140?listItem.shortDescription.slice(0,140)+"...": listItem.shortDescription}</p>
+                                          <p className="item-p"> {listItem.title.length>25?listItem.title.slice(0,25)+"...": listItem.title}  </p>
+                                          <p>{listItem.shortDescription.length>120?listItem.shortDescription.slice(0,120)+"...": listItem.shortDescription}</p>
                                     </a>
                                   </div>
                                   {this.renderLike(listItem, index)}
-                                  <div className="item-content-likes-count" id={"divLikeCount"+index}>{listItem.likesCount} {Number(listItem.likesCount)>1?"Likes":"Like"}</div>
+                                  <div className="item-content-likes-count" id={"divLikeCount"+index}>{(listItem.likesCount!=null && Number(listItem.likesCount)>0)?listItem.likesCount:""} {(listItem.likesCount!=null && Number(listItem.likesCount)>0)?Number(listItem.likesCount)>1?"Likes":"Like":""}</div>
                                   
                                 </div>
                               </div>;

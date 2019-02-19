@@ -3,6 +3,7 @@ define([], function() {
     "PropertyPaneDescription": "Icon Based Navigation Webpart",
     "BasicGroupName": "Custom Property",
     "IconListNameFieldLabel": "List to fetch the Icons",
-    "DefaultImgUrl": "Default Image Url in case image url is not configured"
+    "DefaultImgUrl": "Default Image Url in case image url is not configured",
+    "InventoryListNameFieldLabel":"List Name of component inventory"
   }
 });

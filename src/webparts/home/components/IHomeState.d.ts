@@ -1,4 +1,4 @@
-import { ListItem } from "../services/ListItem";
+import { ListItem } from "../../commonServices/ListItem";
 export interface IHomeState {
     listItems: Array<ListItem>;
     selectedFilter: string;

@@ -9,4 +9,5 @@ export interface IListServce {
     getCurrentUserDetails(): Promise<any>;
     setLikes(listTitle,itemIany,likedByUsers,likesCount, currentUserId):Promise<any>;
     setFavourites(listTitle:string,itemId:number,favouritesAssociates:any[], currentUserId: any):any;
+    getAllRefByCategory(options): Promise<Array<ListItem>>;
 }
