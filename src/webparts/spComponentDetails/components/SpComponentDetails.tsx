@@ -2,7 +2,6 @@ import * as React from 'react';
 import styles from './SpComponentDetails.module.scss';
 import { ISpComponentDetailsProps } from './ISpComponentDetailsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
-import { Column, Row } from 'simple-flexbox';
 import pnp, { Item } from 'sp-pnp-js';
 import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
@@ -21,9 +20,10 @@ export interface ISpComponentDetailsState {
     "ComponentImage": { "Description": "", "Url": "" },
     "DemoUrl": { "Description": "", "Url": "" },
     "ComponentLimitations": "",
-    "ComponentOwner": any,
+    "ComponentOwner": any[],
     "ArtifactsLocation": { "Description": "", "Url": "" },
     "ComponentFeatures": any[],
+    "TechnologyStack":any[],
     "FavoriteAssociates": "",
     "LikedById": any[],
     "LikesCount": number
@@ -36,7 +36,7 @@ export interface ISpComponentDetailsState {
     "Title": string
   };
   // Component owner details - required for fetching the email id
-  componentOwnerDetails:any;
+  componentOwnerDetails:any[];
 
   // Inventory list Guid
   inventoryListId: string;
@@ -56,9 +56,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentImage": { "Description": "", "Url": "" },
         "DemoUrl": { "Description": "", "Url": "" },
         "ComponentLimitations": "",
-        "ComponentOwner": {},
+        "ComponentOwner": [{}],
         "ArtifactsLocation": { "Description": "", "Url": "" },
         "ComponentFeatures": [],
+        "TechnologyStack":[],
         "FavoriteAssociates": "",
         "LikedById": [],
         "LikesCount": 0
@@ -69,7 +70,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "LoginName": "",
         "Title": ""
       },
-      componentOwnerDetails:{"Email":""},
+      componentOwnerDetails:[{"Title":"","Email":""}],
       inventoryListId:""
     };
   }
@@ -95,11 +96,11 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     this.id= queryParameters.getValue("ComponentID");
-    //this.id="4";
+    //this.id="6";
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
-      .expand("ComponentOwner", "ComponentFeatures", "LikedBy")
+      .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack0", "LikedBy")
       .select("ComponentTitle"
         , "ComponentDescription"
         , "ShortDescription"
@@ -109,12 +110,16 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id"
         , "ArtifactsLocation"
         , "ComponentFeatures/Title"
+        , "TechnologyStack0/Title"
         , "FavoriteAssociates"
         , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
       .then((data: any) => {
-        if(data.ComponentOwner.Id != null){
-          this.getCompOwnerDetails(data.ComponentOwner.Id);
+         console.log(data);
+        if(data.ComponentOwner != null){
+          data.ComponentOwner.map((d,id)=>{
+            this.getCompOwnerDetails(d.Id);
+          });
         }
         // When anyone is yet to like the component, LikesCount comes as null. 
         // Set it as 0 in case it is null
@@ -122,10 +127,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           data.LikesCount = 0;
         }
         data.ComponentDescriptionContent = { __html: data.ComponentDescription };
+        data.TechnologyStack = data.TechnologyStack0;
         reactHandler.setState({
           // Assign returned list item data to state
           item: data
         });
+        console.log(data);
         // Service call Get artifact document set for the component
         pnp.sp.web.lists.getByTitle(artifactListName).items
           .expand("Folder", "Folder/ComponentID", "Folder/ComponentID/Id")
@@ -172,13 +179,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     if (this.state.item.DemoUrl != null) {
       // Show demo link
       return (
-        <p className={styles.rcorner}><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
+        <button className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Component Demo</a></button>
+        // <p className={styles.rcorner}><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
       );
     }
     else {
       // Show message
       return (
-        <p className={styles.rcornerDisabled}>No Demo available</p>
+        <a><label>No Demo available</label></a>
       );
     }
   }
@@ -190,14 +198,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       // Build the markup for document links
       var artifactMarkup =
         this.state.artifacts.map((d, idx) => {
-          return (<li key={idx}><a href={d.ServerRelativeUrl}>{d.Name}</a></li>);
+          return (<a href={d.ServerRelativeUrl}>{d.Name}</a>);
         });
       return (artifactMarkup);
     }
     else {
       // Show message
       return (
-        <li>No resource file available</li>
+       <a>No resource file available</a>
       );
     }
   }
@@ -241,10 +249,17 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
    private getCompOwnerDetails(ownerId) {
     var reactHandler = this;
     pnp.sp.web.siteUsers.getById(ownerId).get().then(function(result) {
-      reactHandler.setState({
-        // Set the returned user object to state
-        componentOwnerDetails : result
-      });
+      console.log("owner detail");
+      console.log(result);
+      reactHandler.state.componentOwnerDetails.push(result);
+          console.log(reactHandler.state.componentOwnerDetails);
+          if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
+            var compOwners = reactHandler.state.componentOwnerDetails;
+            reactHandler.setState({
+              // Set the returned user object to state
+              componentOwnerDetails : compOwners
+            });
+          }
     })
     .catch((error) => {
       LogManager.logException(error
@@ -345,7 +360,278 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
     return (
-      <div>
+    <div className="main-content">
+		  <div className="content-container"> 
+        <div className="">
+          <div className="row">
+            <div className="col-md-12 compTitle paddingLeft0">
+              <h3 className="">{escape(this.state.item.ComponentTitle)}</h3>
+            </div>
+            <div className="col-md-12 topTitle paddingLeft0">
+              <div className="col-md-10 col-sm-9 padding0 topLeftTitle">
+                <div className="padding0 lFloat">
+                  <label className="caption">Technology:</label>
+                  <label className="description">
+                     {this.state.item.TechnologyStack.map((d, idx) => {
+                       if(idx==0){
+                        return (d.Title);
+                       }
+                       else{
+                         return ", " + (d.Title);
+                       }
+                    })}
+                  </label>
+                </div>
+                <span className="pipe">|</span>
+                <div className="padding0 lFloat">
+                  <label className="caption">Feature:</label>
+                  <label className="description">
+                     {this.state.item.ComponentFeatures.map((d, idx) => {
+                       if(idx==0){
+                        return (d.Title);
+                       }
+                       else{
+                         return ", " + (d.Title);
+                       }
+                    })}
+                    </label>
+                </div>
+                {/*<span className="pipe">|</span>
+                <div className="padding0 lFloat">
+                  <label className="caption">Business:</label>
+                  <label className="description">Business 2</label>
+                </div>*/}
+              </div>
+              <div className="col-md-2 col-sm-3 topRightTitle padding0">
+                <div className="lFloat">
+                  <label className="caption">Date:</label>
+                  <label className="description">24.06.2018</label>
+                </div>
+                {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?<span className="pipe">|</span>:""}
+                <div className="lFloat">
+                  <label className="description">
+                    {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?this.state.item.LikesCount:""} {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?Number(this.state.item.LikesCount)>1?"Likes":"Like":""}
+                    </label>					
+                </div>
+            </div>
+          </div> 	        
+          <div className="col-md-12 noteContent paddingLeft0 ">
+            <div className="col-md-8 col-xs-12 paddingLeft0 leftContent">
+              <div className="col-md-12 shortNoteSection paddingLeft0">
+                <div className="col-md-12 shortNote paddingLeft0">
+                  <h3>Description:</h3>
+                  <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
+                </div>
+                <div className="col-md-6 addtoFav">
+                  <div className="col-md-6 paddingLeft0 addFavSection">				
+                    <span className="starIcon"></span>						
+                    <label> Add to favorite</label>						
+                  </div>
+                  <div className="col-md-6 paddingLeft0 likeSection">				
+                    <span className="likeIcon"></span>						
+                    <label> Like</label>						
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/*<div data-reactroot="" id="divComments">
+              <h2 data-toggle="collapse" data-target="#comments" className="action-btn">Comments(3)</h2>
+              <div id="comments" className="panel-body">
+                <div className="comment-block comment-post">
+                  <div className="form-group">
+                    <label>Add comment:</label>
+                    <textarea className="form-control" name="comments"></textarea><span className="hideElem">Please provide comments</span></div>
+                  <button className="btn btn-default post-btn pull-right">Post Comment</button>
+                </div>
+                <div>
+                  <div>
+                    <div className="comment-block">
+                      <div className="ms-Persona ms-Persona--size24 root-74">
+                        <div className="ms-Persona-coin ms-Persona--size24 coin-81">
+                          <div className="ms-Persona-imageArea imageArea-83">
+                            <div className="ms-Image ms-Persona-image image-86">
+                              <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="ms-Persona-details details-75">
+                          <div className="ms-Persona-primaryText primaryText-76">
+                            <div className="ms-TooltipHost host_a3f87333">
+                              
+                            </div>
+                          </div>
+                          <div className="ms-Persona-secondaryText secondaryText-77"></div>
+                          <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
+                          <div className="ms-Persona-optionalText optionalText-79"></div>
+                        </div>
+                      </div>
+                      <time className="posted-date comment-people-dg" title="February 12, 2019, 1:48 PM">February 12, 2019, 1:48 PM</time>
+                      <p className="comment-people-dg">
+                        <div className="ExternalClassC4DB25B9A99B4310A5D5E85FAEE2B543">Third comment!</div>
+                      </p>
+                      <button type="button" className="btn btn-default reply-btn pull-right" id="59_id">Reply</button>
+                      <div className="hideElem">
+                        <textarea className="form-control" name="replyToComments"></textarea>
+                        <br /><span className="hideElem">Please provide comments</span>
+                        <br />
+                        <button type="button" className="btn btn-default post-btn pull-right" id="59_id">Post Reply</button>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div className="child-replies">
+                        <div>
+                          <div className="ms-Persona ms-Persona--size24 root-74">
+                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
+                              <div className="ms-Persona-imageArea imageArea-83">
+                                <div className="ms-Image ms-Persona-image image-86">
+                                  <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ms-Persona-details details-75">
+                              <div className="ms-Persona-primaryText primaryText-76">
+                                <div className="ms-TooltipHost host_a3f87333">
+
+                                </div>
+                              </div>
+                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
+                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
+                              <div className="ms-Persona-optionalText optionalText-79"></div>
+                            </div>
+                          </div>
+                          <time className="posted-date comment-people-dg" title="February 04, 2019, 1:25 PM">February 04, 2019, 1:25 PM</time>
+                        </div>
+                        <div>
+                          <p className="comment-people-dg">
+                            <div className="ExternalClassB36DCE621B1543E0B7143A198B74532D">hello</div>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="child-replies">
+                        <div>
+                          <div className="ms-Persona ms-Persona--size24 root-74">
+                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
+                              <div className="ms-Persona-imageArea imageArea-83">
+                                <div className="ms-Image ms-Persona-image image-86"><img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ms-Persona-details details-75">
+                              <div className="ms-Persona-primaryText primaryText-76">
+                                <div className="ms-TooltipHost host_a3f87333">
+                                </div>
+                              </div>
+                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
+                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
+                              <div className="ms-Persona-optionalText optionalText-79"></div>
+                            </div>
+                          </div>
+                          <time className="posted-date comment-people-dg" title="December 03, 2018, 3:12 PM">December 03, 2018, 3:12 PM</time>
+                        </div>
+                        <div>
+                          <p className="comment-people-dg">
+                            <div className="ExternalClass9E5951F94B274C9F8ADCD6FE9D24273C">hi</div>
+                          </p>
+                        </div>
+                      </div>
+                      <div className="child-replies">
+                        <div>
+                          <div className="ms-Persona ms-Persona--size24 root-74">
+                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
+                              <div className="ms-Persona-imageArea imageArea-83">
+                                <div className="ms-Image ms-Persona-image image-86" >
+                                  <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ms-Persona-details details-75">
+                              <div className="ms-Persona-primaryText primaryText-76">
+                                <div className="ms-TooltipHost host_a3f87333">
+                                 
+                                </div>
+                              </div>
+                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
+                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
+                              <div className="ms-Persona-optionalText optionalText-79"></div>
+                            </div>
+                          </div>
+                          <time className="posted-date comment-people-dg" title="November 29, 2018, 9:49 PM">November 29, 2018, 9:49 PM</time>
+                        </div>
+                        <div>
+                          <p className="comment-people-dg">
+                            <div className="ExternalClassD18552FF8DF346F2A0C820F01B661CD1">reply works..</div>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>*/}
+         
+          <div className="col-md-4 col-xs-12 rightContent">
+            <div className="col-md-12 padding0">
+              <h3 className="compowner"> Component Owner </h3>
+            </div>
+            {
+              this.state.componentOwnerDetails.map((d,index)=>{
+                if(index!=0){
+                    return(
+                    <div className="col-md-12 compownerSection">
+                    <div className="col-md-3 col-xs-1 padding0">
+                      <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic" src={"/_layouts/15/userphoto.aspx?size=S&amp;accountname="+d.UserName} alt="" />
+                    </div>
+                    <div className="col-md-9 col-xs-11 padding0">
+                      <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
+                      <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
+                      <span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
+                      <span className="col-md-3 col-xs-3 compownerEmailField">Email: </span>
+                      <a className="col-md-9 col-xs-9 compownerEmail">{d.Email}</a>
+                    </div>
+                  </div>);
+                }
+              })
+              
+            }
+            
+            {/*<div className="col-md-12 compownerSection">
+              <div className="col-md-3 col-xs-1 padding0">
+                <span className="compownerPic">  </span>
+              </div>
+              <div className="col-md-9 col-xs-11 padding0">
+                <span className="col-md-12 col-xs-12 compownerName">Mike Jackson </span>
+                <span className="col-md-12 col-xs-12 compownerDesig">Sr. Architect  </span>
+                <span className="col-md-12 col-xs-12 compownerUnit">Cognizant Interactive </span>
+                <span className="col-md-3 col-xs-3 compownerEmailField">Email: </span>
+                <a className="col-md-9 col-xs-9 compownerEmail">Mike.jackson@cognizant.com</a>
+              </div>
+            </div>*/}
+            
+            <div className="col-md-12 compDemo">
+              {this.renderDemoLink()}
+            </div>
+            
+            <div className="col-md-12 addRes">
+              <h3 className="">Additional Resource</h3>
+              <div className="listOfRes">
+                {this.renderArtifacts()}
+              </div>
+            </div>            
+          </div><br /><br />
+           </div>
+        </div>           
+      </div>
+    </div>
+  </div>
+ );
+
+
+
+
+
+      {/*<div>
       { 
         (this.state && this.state.item && this.state.item.ComponentTitle !="")?
         <div className={styles.spComponentDetails}>
@@ -407,7 +693,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         </div>
         :<div>Loading component details. Please wait...</div>
       }
-      </div>
-    );
+      </div>*/}
   }
 }

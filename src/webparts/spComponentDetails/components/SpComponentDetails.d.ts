@@ -19,12 +19,13 @@ export interface ISpComponentDetailsState {
             "Url": "";
         };
         "ComponentLimitations": "";
-        "ComponentOwner": any;
+        "ComponentOwner": any[];
         "ArtifactsLocation": {
             "Description": "";
             "Url": "";
         };
         "ComponentFeatures": any[];
+        "TechnologyStack": any[];
         "FavoriteAssociates": "";
         "LikedById": any[];
         "LikesCount": number;
@@ -35,7 +36,7 @@ export interface ISpComponentDetailsState {
         "LoginName": string;
         "Title": string;
     };
-    componentOwnerDetails: any;
+    componentOwnerDetails: any[];
     inventoryListId: string;
 }
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {

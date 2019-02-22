@@ -11,7 +11,6 @@ var __extends = (this && this.__extends) || (function () {
 import * as React from 'react';
 import styles from './SpComponentDetails.module.scss';
 import { escape } from '@microsoft/sp-lodash-subset';
-import { Column, Row } from 'simple-flexbox';
 import pnp from 'sp-pnp-js';
 import { UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
@@ -31,9 +30,10 @@ var SpComponentDetails = (function (_super) {
                 "ComponentImage": { "Description": "", "Url": "" },
                 "DemoUrl": { "Description": "", "Url": "" },
                 "ComponentLimitations": "",
-                "ComponentOwner": {},
+                "ComponentOwner": [{}],
                 "ArtifactsLocation": { "Description": "", "Url": "" },
                 "ComponentFeatures": [],
+                "TechnologyStack": [],
                 "FavoriteAssociates": "",
                 "LikedById": [],
                 "LikesCount": 0
@@ -44,7 +44,7 @@ var SpComponentDetails = (function (_super) {
                 "LoginName": "",
                 "Title": ""
             },
-            componentOwnerDetails: { "Email": "" },
+            componentOwnerDetails: [{ "Title": "", "Email": "" }],
             inventoryListId: ""
         };
         return _this;
@@ -67,16 +67,19 @@ var SpComponentDetails = (function (_super) {
         // Get component id from query string
         var queryParameters = new UrlQueryParameterCollection(window.location.href);
         this.id = queryParameters.getValue("ComponentID");
-        //this.id="4";
+        //this.id="6";
         // Service call to fetch the component details by component id
         pnp.sp.web.lists.getByTitle(inventoryList).items
             .getById(Number(this.id))
-            .expand("ComponentOwner", "ComponentFeatures", "LikedBy")
-            .select("ComponentTitle", "ComponentDescription", "ShortDescription", "ComponentImage", "DemoUrl", "ComponentLimitations", "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id", "ArtifactsLocation", "ComponentFeatures/Title", "FavoriteAssociates", "LikedBy/Id", "LikedById", "LikesCount")
+            .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack0", "LikedBy")
+            .select("ComponentTitle", "ComponentDescription", "ShortDescription", "ComponentImage", "DemoUrl", "ComponentLimitations", "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id", "ArtifactsLocation", "ComponentFeatures/Title", "TechnologyStack0/Title", "FavoriteAssociates", "LikedBy/Id", "LikedById", "LikesCount")
             .get()
             .then(function (data) {
-            if (data.ComponentOwner.Id != null) {
-                _this.getCompOwnerDetails(data.ComponentOwner.Id);
+            console.log(data);
+            if (data.ComponentOwner != null) {
+                data.ComponentOwner.map(function (d, id) {
+                    _this.getCompOwnerDetails(d.Id);
+                });
             }
             // When anyone is yet to like the component, LikesCount comes as null. 
             // Set it as 0 in case it is null
@@ -84,10 +87,12 @@ var SpComponentDetails = (function (_super) {
                 data.LikesCount = 0;
             }
             data.ComponentDescriptionContent = { __html: data.ComponentDescription };
+            data.TechnologyStack = data.TechnologyStack0;
             reactHandler.setState({
                 // Assign returned list item data to state
                 item: data
             });
+            console.log(data);
             // Service call Get artifact document set for the component
             pnp.sp.web.lists.getByTitle(artifactListName).items
                 .expand("Folder", "Folder/ComponentID", "Folder/ComponentID/Id")
@@ -123,12 +128,14 @@ var SpComponentDetails = (function (_super) {
     SpComponentDetails.prototype.renderDemoLink = function () {
         if (this.state.item.DemoUrl != null) {
             // Show demo link
-            return (React.createElement("p", { className: styles.rcorner },
-                React.createElement("a", { target: "_blank", href: this.state.item.DemoUrl.Url, className: styles.link }, "View Demo")));
+            return (React.createElement("button", { className: "col-md-12 btn btn-default" },
+                React.createElement("i", { className: "fa fa-chevron-right", "aria-hidden": "true" }),
+                React.createElement("a", { target: "_blank", href: this.state.item.DemoUrl.Url, className: styles.link }, "View Component Demo")));
         }
         else {
             // Show message
-            return (React.createElement("p", { className: styles.rcornerDisabled }, "No Demo available"));
+            return (React.createElement("a", null,
+                React.createElement("label", null, "No Demo available")));
         }
     };
     // Check the artifact files are available or not
@@ -137,14 +144,13 @@ var SpComponentDetails = (function (_super) {
         if (this.state.artifacts != null && this.state.artifacts.length > 0) {
             // Build the markup for document links
             var artifactMarkup = this.state.artifacts.map(function (d, idx) {
-                return (React.createElement("li", { key: idx },
-                    React.createElement("a", { href: d.ServerRelativeUrl }, d.Name)));
+                return (React.createElement("a", { href: d.ServerRelativeUrl }, d.Name));
             });
             return (artifactMarkup);
         }
         else {
             // Show message
-            return (React.createElement("li", null, "No resource file available"));
+            return (React.createElement("a", null, "No resource file available"));
         }
     };
     // Make a service call to get the user details
@@ -178,10 +184,17 @@ var SpComponentDetails = (function (_super) {
     SpComponentDetails.prototype.getCompOwnerDetails = function (ownerId) {
         var reactHandler = this;
         pnp.sp.web.siteUsers.getById(ownerId).get().then(function (result) {
-            reactHandler.setState({
-                // Set the returned user object to state
-                componentOwnerDetails: result
-            });
+            console.log("owner detail");
+            console.log(result);
+            reactHandler.state.componentOwnerDetails.push(result);
+            console.log(reactHandler.state.componentOwnerDetails);
+            if (reactHandler.state.componentOwnerDetails.length >= reactHandler.state.item.ComponentOwner.length) {
+                var compOwners = reactHandler.state.componentOwnerDetails;
+                reactHandler.setState({
+                    // Set the returned user object to state
+                    componentOwnerDetails: compOwners
+                });
+            }
         })
             .catch(function (error) {
             LogManager.logException(error, "Error occured while fetching component owner details.", "Cpmponent Details", "getCompOwnerDetails");
@@ -254,38 +267,88 @@ var SpComponentDetails = (function (_super) {
     // Build and render the final markup to show on the page
     // simple-flexbox module is used to build row column design
     SpComponentDetails.prototype.render = function () {
-        return (React.createElement("div", null, (this.state && this.state.item && this.state.item.ComponentTitle != "") ?
-            React.createElement("div", { className: styles.spComponentDetails },
-                React.createElement(Row, { className: styles.containerRow },
-                    React.createElement(Column, { flexGrow: 1, className: styles.left },
-                        React.createElement("div", null,
-                            React.createElement("div", { id: "divComponentTitle" },
-                                React.createElement("h1", null, escape(this.state.item.ComponentTitle))),
-                            React.createElement("div", { id: "divShortDescription" },
-                                React.createElement("p", null, escape(this.state.item.ShortDescription))),
-                            React.createElement("div", { id: "divComponentDescriptionContent" },
-                                React.createElement("p", { dangerouslySetInnerHTML: this.state.item.ComponentDescriptionContent })),
-                            React.createElement("div", { id: "divComponentImage" },
-                                React.createElement("img", { src: this.state.item.ComponentImage.Url, alt: "" })))),
-                    React.createElement(Column, { flexGrow: 1, className: styles.middle }),
-                    React.createElement(Column, { flexGrow: 1, className: styles.right },
-                        React.createElement("div", null,
+        return (React.createElement("div", { className: "main-content" },
+            React.createElement("div", { className: "content-container" },
+                React.createElement("div", { className: "" },
+                    React.createElement("div", { className: "row" },
+                        React.createElement("div", { className: "col-md-12 compTitle paddingLeft0" },
+                            React.createElement("h3", { className: "" }, escape(this.state.item.ComponentTitle))),
+                        React.createElement("div", { className: "col-md-12 topTitle paddingLeft0" },
+                            React.createElement("div", { className: "col-md-10 col-sm-9 padding0 topLeftTitle" },
+                                React.createElement("div", { className: "padding0 lFloat" },
+                                    React.createElement("label", { className: "caption" }, "Technology:"),
+                                    React.createElement("label", { className: "description" }, this.state.item.TechnologyStack.map(function (d, idx) {
+                                        if (idx == 0) {
+                                            return (d.Title);
+                                        }
+                                        else {
+                                            return ", " + (d.Title);
+                                        }
+                                    }))),
+                                React.createElement("span", { className: "pipe" }, "|"),
+                                React.createElement("div", { className: "padding0 lFloat" },
+                                    React.createElement("label", { className: "caption" }, "Feature:"),
+                                    React.createElement("label", { className: "description" }, this.state.item.ComponentFeatures.map(function (d, idx) {
+                                        if (idx == 0) {
+                                            return (d.Title);
+                                        }
+                                        else {
+                                            return ", " + (d.Title);
+                                        }
+                                    })))),
+                            React.createElement("div", { className: "col-md-2 col-sm-3 topRightTitle padding0" },
+                                React.createElement("div", { className: "lFloat" },
+                                    React.createElement("label", { className: "caption" }, "Date:"),
+                                    React.createElement("label", { className: "description" }, "24.06.2018")),
+                                (this.state.item.LikesCount != null && Number(this.state.item.LikesCount) > 0) ? React.createElement("span", { className: "pipe" }, "|") : "",
+                                React.createElement("div", { className: "lFloat" },
+                                    React.createElement("label", { className: "description" },
+                                        (this.state.item.LikesCount != null && Number(this.state.item.LikesCount) > 0) ? this.state.item.LikesCount : "",
+                                        " ",
+                                        (this.state.item.LikesCount != null && Number(this.state.item.LikesCount) > 0) ? Number(this.state.item.LikesCount) > 1 ? "Likes" : "Like" : "")))),
+                        React.createElement("div", { className: "col-md-12 noteContent paddingLeft0 " },
+                            React.createElement("div", { className: "col-md-8 col-xs-12 paddingLeft0 leftContent" },
+                                React.createElement("div", { className: "col-md-12 shortNoteSection paddingLeft0" },
+                                    React.createElement("div", { className: "col-md-12 shortNote paddingLeft0" },
+                                        React.createElement("h3", null, "Description:"),
+                                        React.createElement("p", { dangerouslySetInnerHTML: this.state.item.ComponentDescriptionContent })),
+                                    React.createElement("div", { className: "col-md-6 addtoFav" },
+                                        React.createElement("div", { className: "col-md-6 paddingLeft0 addFavSection" },
+                                            React.createElement("span", { className: "starIcon" }),
+                                            React.createElement("label", null, " Add to favorite")),
+                                        React.createElement("div", { className: "col-md-6 paddingLeft0 likeSection" },
+                                            React.createElement("span", { className: "likeIcon" }),
+                                            React.createElement("label", null, " Like"))))),
+                            React.createElement("div", { className: "col-md-4 col-xs-12 rightContent" },
+                                React.createElement("div", { className: "col-md-12 padding0" },
+                                    React.createElement("h3", { className: "compowner" }, " Component Owner ")),
+                                this.state.componentOwnerDetails.map(function (d, index) {
+                                    if (index != 0) {
+                                        return (React.createElement("div", { className: "col-md-12 compownerSection" },
+                                            React.createElement("div", { className: "col-md-3 col-xs-1 padding0" },
+                                                React.createElement("img", { className: "ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic", src: "/_layouts/15/userphoto.aspx?size=S&amp;accountname=" + d.UserName, alt: "" })),
+                                            React.createElement("div", { className: "col-md-9 col-xs-11 padding0" },
+                                                React.createElement("span", { className: "col-md-12 col-xs-12 compownerName" },
+                                                    d.Title,
+                                                    " "),
+                                                React.createElement("span", { className: "col-md-12 col-xs-12 compownerDesig" },
+                                                    d.Designation,
+                                                    "  "),
+                                                React.createElement("span", { className: "col-md-12 col-xs-12 compownerUnit" },
+                                                    d.Department,
+                                                    " "),
+                                                React.createElement("span", { className: "col-md-3 col-xs-3 compownerEmailField" }, "Email: "),
+                                                React.createElement("a", { className: "col-md-9 col-xs-9 compownerEmail" }, d.Email))));
+                                    }
+                                }),
+                                React.createElement("div", { className: "col-md-12 compDemo" }, this.renderDemoLink()),
+                                React.createElement("div", { className: "col-md-12 addRes" },
+                                    React.createElement("h3", { className: "" }, "Additional Resource"),
+                                    React.createElement("div", { className: "listOfRes" }, this.renderArtifacts()))),
                             React.createElement("br", null),
-                            React.createElement("div", { id: "divDemoUrl" }, this.renderDemoLink()),
-                            React.createElement("br", null),
-                            React.createElement("div", { id: "dicAdditionalResourcesHeader" },
-                                React.createElement("h2", null, "Additional Resources")),
-                            React.createElement("div", { id: "divAdditionalResources" },
-                                React.createElement("ul", null, this.renderArtifacts())),
-                            React.createElement("br", null),
-                            React.createElement("div", { id: "divComponentOwner" },
-                                React.createElement("p", { className: styles.rcorner },
-                                    React.createElement("a", { href: 'mailto:' + this.state.componentOwnerDetails.Email, className: styles.link }, "Contact Component Owner")))),
-                        React.createElement("br", null),
-                        React.createElement("div", { id: "divFav" }, this.renderFavouriteImage()),
-                        React.createElement("br", null),
-                        React.createElement("div", { id: "divLike" }, this.renderLike()))))
-            : React.createElement("div", null, "Loading component details. Please wait...")));
+                            React.createElement("br", null)))))));
+        {
+        }
     };
     return SpComponentDetails;
 }(React.Component));

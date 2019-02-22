@@ -14,13 +14,13 @@ export class ListMock implements IListServce {
             const data: Array<ListItem>  = [];        
             pnp.sp.web.lists.getByTitle(options.sourceList).items
             .filter("ComponentStatus eq 'Active'")
-            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory/Title",'LikesCount','ShortDescription', "LikedBy/Id", "LikedById")
-            .expand("ComponentCategory", "LikedBy")
+            .select("ID",options.titleColumnName,options.imageColumnName,'Modified',"ComponentCategory0/Title",'LikesCount','ShortDescription', "LikedBy/Id", "LikedById")
+            .expand("ComponentCategory0", "LikedBy")
             .orderBy(options.orderBy,options.isAsending)            
             .get().then( r => 
             {                                     
                     for(let i=0;i<r.length;i++){
-                        data.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription,likedById:r[i].LikedById});       
+                        data.push({id:r[i].ID,title:r[i][options.titleColumnName],modified:r[i].Modified,imageUrl:r[i][options.imageColumnName].Url,componentCategory:(r[i]["ComponentCategory0"]).Title,likesCount:r[i].LikesCount,shortDescription:r[i].ShortDescription,likedById:r[i].LikedById});       
                     }                              
                     resolve(data);                        
             })
@@ -36,12 +36,12 @@ export class ListMock implements IListServce {
             const data: Array<ListItem>  = [];        
             pnp.sp.web.lists.getByTitle(sourceList).items
             .filter("ComponentStatus eq 'Active'")
-            .select("ID","ComponentCategory/Title")
-            .expand("ComponentCategory")      
+            .select("ID","ComponentCategory0/Title")
+            .expand("ComponentCategory0")      
             .get().then( r => 
             {                                     
                     for(let i=0;i<r.length;i++){
-                        data.push({id:r[i].ID,title:"",modified:"",imageUrl:"",componentCategory:(r[i]["ComponentCategory"]).Title,likesCount:"",shortDescription:"",likedById:[]});       
+                        data.push({id:r[i].ID,title:"",modified:"",imageUrl:"",componentCategory:(r[i]["ComponentCategory0"]).Title,likesCount:"",shortDescription:"",likedById:[]});       
                     }                              
                     resolve(data);                        
             })
