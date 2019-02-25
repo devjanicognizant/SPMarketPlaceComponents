@@ -71,8 +71,8 @@ var SpComponentDetails = (function (_super) {
         // Service call to fetch the component details by component id
         pnp.sp.web.lists.getByTitle(inventoryList).items
             .getById(Number(this.id))
-            .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack0", "LikedBy")
-            .select("ComponentTitle", "ComponentDescription", "ShortDescription", "ComponentImage", "DemoUrl", "ComponentLimitations", "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id", "ArtifactsLocation", "ComponentFeatures/Title", "TechnologyStack0/Title", "FavoriteAssociates", "LikedBy/Id", "LikedById", "LikesCount")
+            .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack", "LikedBy")
+            .select("ComponentTitle", "ComponentDescription", "ShortDescription", "ComponentImage", "DemoUrl", "ComponentLimitations", "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id", "ArtifactsLocation", "ComponentFeatures/Title", "TechnologyStack/Title", "FavoriteAssociates", "LikedBy/Id", "LikedById", "LikesCount")
             .get()
             .then(function (data) {
             console.log(data);
@@ -87,7 +87,7 @@ var SpComponentDetails = (function (_super) {
                 data.LikesCount = 0;
             }
             data.ComponentDescriptionContent = { __html: data.ComponentDescription };
-            data.TechnologyStack = data.TechnologyStack0;
+            data.TechnologyStack = data.TechnologyStack;
             reactHandler.setState({
                 // Assign returned list item data to state
                 item: data
@@ -319,6 +319,91 @@ var SpComponentDetails = (function (_super) {
                                         React.createElement("div", { className: "col-md-6 paddingLeft0 likeSection" },
                                             React.createElement("span", { className: "likeIcon" }),
                                             React.createElement("label", null, " Like"))))),
+                            React.createElement("div", { "data-reactroot": "", id: "divComments" },
+                                React.createElement("h2", { "data-toggle": "collapse", "data-target": "#comments", className: "action-btn" }, "Comments(3)"),
+                                React.createElement("div", { id: "comments", className: "panel-body" },
+                                    React.createElement("div", { className: "comment-block comment-post" },
+                                        React.createElement("div", { className: "form-group" },
+                                            React.createElement("label", null, "Add comment:"),
+                                            React.createElement("textarea", { className: "form-control", name: "comments" }),
+                                            React.createElement("span", { className: "hideElem" }, "Please provide comments")),
+                                        React.createElement("button", { className: "btn btn-default post-btn pull-right" }, "Post Comment")),
+                                    React.createElement("div", null,
+                                        React.createElement("div", null,
+                                            React.createElement("div", { className: "comment-block" },
+                                                React.createElement("div", { className: "ms-Persona ms-Persona--size24 root-74" },
+                                                    React.createElement("div", { className: "ms-Persona-coin ms-Persona--size24 coin-81" },
+                                                        React.createElement("div", { className: "ms-Persona-imageArea imageArea-83" },
+                                                            React.createElement("div", { className: "ms-Image ms-Persona-image image-86" },
+                                                                React.createElement("img", { className: "ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91", src: "/_layouts/15/userphoto.aspx?size=S&accountname=undefined", alt: "" })))),
+                                                    React.createElement("div", { className: "ms-Persona-details details-75" },
+                                                        React.createElement("div", { className: "ms-Persona-primaryText primaryText-76" },
+                                                            React.createElement("div", { className: "ms-TooltipHost host_a3f87333" })),
+                                                        React.createElement("div", { className: "ms-Persona-secondaryText secondaryText-77" }),
+                                                        React.createElement("div", { className: "ms-Persona-tertiaryText tertiaryText-78" }),
+                                                        React.createElement("div", { className: "ms-Persona-optionalText optionalText-79" }))),
+                                                React.createElement("time", { className: "posted-date comment-people-dg", title: "February 12, 2019, 1:48 PM" }, "February 12, 2019, 1:48 PM"),
+                                                React.createElement("p", { className: "comment-people-dg" },
+                                                    React.createElement("div", { className: "ExternalClassC4DB25B9A99B4310A5D5E85FAEE2B543" }, "Third comment!")),
+                                                React.createElement("button", { type: "button", className: "btn btn-default reply-btn pull-right", id: "59_id" }, "Reply"),
+                                                React.createElement("div", { className: "hideElem" },
+                                                    React.createElement("textarea", { className: "form-control", name: "replyToComments" }),
+                                                    React.createElement("br", null),
+                                                    React.createElement("span", { className: "hideElem" }, "Please provide comments"),
+                                                    React.createElement("br", null),
+                                                    React.createElement("button", { type: "button", className: "btn btn-default post-btn pull-right", id: "59_id" }, "Post Reply"))),
+                                            React.createElement("div", null,
+                                                React.createElement("div", { className: "child-replies" },
+                                                    React.createElement("div", null,
+                                                        React.createElement("div", { className: "ms-Persona ms-Persona--size24 root-74" },
+                                                            React.createElement("div", { className: "ms-Persona-coin ms-Persona--size24 coin-81" },
+                                                                React.createElement("div", { className: "ms-Persona-imageArea imageArea-83" },
+                                                                    React.createElement("div", { className: "ms-Image ms-Persona-image image-86" },
+                                                                        React.createElement("img", { className: "ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91", src: "/_layouts/15/userphoto.aspx?size=S&accountname=undefined", alt: "" })))),
+                                                            React.createElement("div", { className: "ms-Persona-details details-75" },
+                                                                React.createElement("div", { className: "ms-Persona-primaryText primaryText-76" },
+                                                                    React.createElement("div", { className: "ms-TooltipHost host_a3f87333" })),
+                                                                React.createElement("div", { className: "ms-Persona-secondaryText secondaryText-77" }),
+                                                                React.createElement("div", { className: "ms-Persona-tertiaryText tertiaryText-78" }),
+                                                                React.createElement("div", { className: "ms-Persona-optionalText optionalText-79" }))),
+                                                        React.createElement("time", { className: "posted-date comment-people-dg", title: "February 04, 2019, 1:25 PM" }, "February 04, 2019, 1:25 PM")),
+                                                    React.createElement("div", null,
+                                                        React.createElement("p", { className: "comment-people-dg" },
+                                                            React.createElement("div", { className: "ExternalClassB36DCE621B1543E0B7143A198B74532D" }, "hello")))),
+                                                React.createElement("div", { className: "child-replies" },
+                                                    React.createElement("div", null,
+                                                        React.createElement("div", { className: "ms-Persona ms-Persona--size24 root-74" },
+                                                            React.createElement("div", { className: "ms-Persona-coin ms-Persona--size24 coin-81" },
+                                                                React.createElement("div", { className: "ms-Persona-imageArea imageArea-83" },
+                                                                    React.createElement("div", { className: "ms-Image ms-Persona-image image-86" },
+                                                                        React.createElement("img", { className: "ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91", src: "/_layouts/15/userphoto.aspx?size=S&accountname=undefined", alt: "" })))),
+                                                            React.createElement("div", { className: "ms-Persona-details details-75" },
+                                                                React.createElement("div", { className: "ms-Persona-primaryText primaryText-76" },
+                                                                    React.createElement("div", { className: "ms-TooltipHost host_a3f87333" })),
+                                                                React.createElement("div", { className: "ms-Persona-secondaryText secondaryText-77" }),
+                                                                React.createElement("div", { className: "ms-Persona-tertiaryText tertiaryText-78" }),
+                                                                React.createElement("div", { className: "ms-Persona-optionalText optionalText-79" }))),
+                                                        React.createElement("time", { className: "posted-date comment-people-dg", title: "December 03, 2018, 3:12 PM" }, "December 03, 2018, 3:12 PM")),
+                                                    React.createElement("div", null,
+                                                        React.createElement("p", { className: "comment-people-dg" },
+                                                            React.createElement("div", { className: "ExternalClass9E5951F94B274C9F8ADCD6FE9D24273C" }, "hi")))),
+                                                React.createElement("div", { className: "child-replies" },
+                                                    React.createElement("div", null,
+                                                        React.createElement("div", { className: "ms-Persona ms-Persona--size24 root-74" },
+                                                            React.createElement("div", { className: "ms-Persona-coin ms-Persona--size24 coin-81" },
+                                                                React.createElement("div", { className: "ms-Persona-imageArea imageArea-83" },
+                                                                    React.createElement("div", { className: "ms-Image ms-Persona-image image-86" },
+                                                                        React.createElement("img", { className: "ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91", src: "/_layouts/15/userphoto.aspx?size=S&accountname=undefined", alt: "" })))),
+                                                            React.createElement("div", { className: "ms-Persona-details details-75" },
+                                                                React.createElement("div", { className: "ms-Persona-primaryText primaryText-76" },
+                                                                    React.createElement("div", { className: "ms-TooltipHost host_a3f87333" })),
+                                                                React.createElement("div", { className: "ms-Persona-secondaryText secondaryText-77" }),
+                                                                React.createElement("div", { className: "ms-Persona-tertiaryText tertiaryText-78" }),
+                                                                React.createElement("div", { className: "ms-Persona-optionalText optionalText-79" }))),
+                                                        React.createElement("time", { className: "posted-date comment-people-dg", title: "November 29, 2018, 9:49 PM" }, "November 29, 2018, 9:49 PM")),
+                                                    React.createElement("div", null,
+                                                        React.createElement("p", { className: "comment-people-dg" },
+                                                            React.createElement("div", { className: "ExternalClassD18552FF8DF346F2A0C820F01B661CD1" }, "reply works.."))))))))),
                             React.createElement("div", { className: "col-md-4 col-xs-12 rightContent" },
                                 React.createElement("div", { className: "col-md-12 padding0" },
                                     React.createElement("h3", { className: "compowner" }, " Component Owner ")),
@@ -338,7 +423,7 @@ var SpComponentDetails = (function (_super) {
                                                     d.Department,
                                                     " "),
                                                 React.createElement("span", { className: "col-md-3 col-xs-3 compownerEmailField" }, "Email: "),
-                                                React.createElement("a", { className: "col-md-9 col-xs-9 compownerEmail" }, d.Email))));
+                                                React.createElement("a", { className: "col-md-9 col-xs-9 compownerEmail", href: 'mailto:' + d.Email }, d.Email))));
                                     }
                                 }),
                                 React.createElement("div", { className: "col-md-12 compDemo" }, this.renderDemoLink()),

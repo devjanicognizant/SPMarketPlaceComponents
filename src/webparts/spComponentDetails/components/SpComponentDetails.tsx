@@ -100,7 +100,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
-      .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack0", "LikedBy")
+      .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack", "LikedBy")
       .select("ComponentTitle"
         , "ComponentDescription"
         , "ShortDescription"
@@ -110,7 +110,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentOwner/Title", "ComponentOwner/UserName", "ComponentOwner/Id"
         , "ArtifactsLocation"
         , "ComponentFeatures/Title"
-        , "TechnologyStack0/Title"
+        , "TechnologyStack/Title"
         , "FavoriteAssociates"
         , "LikedBy/Id", "LikedById", "LikesCount")
       .get()
@@ -127,7 +127,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           data.LikesCount = 0;
         }
         data.ComponentDescriptionContent = { __html: data.ComponentDescription };
-        data.TechnologyStack = data.TechnologyStack0;
+        data.TechnologyStack = data.TechnologyStack;
         reactHandler.setState({
           // Assign returned list item data to state
           item: data
@@ -434,142 +434,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 </div>
               </div>
             </div>
-            {/*<div data-reactroot="" id="divComments">
-              <h2 data-toggle="collapse" data-target="#comments" className="action-btn">Comments(3)</h2>
-              <div id="comments" className="panel-body">
-                <div className="comment-block comment-post">
-                  <div className="form-group">
-                    <label>Add comment:</label>
-                    <textarea className="form-control" name="comments"></textarea><span className="hideElem">Please provide comments</span></div>
-                  <button className="btn btn-default post-btn pull-right">Post Comment</button>
-                </div>
-                <div>
-                  <div>
-                    <div className="comment-block">
-                      <div className="ms-Persona ms-Persona--size24 root-74">
-                        <div className="ms-Persona-coin ms-Persona--size24 coin-81">
-                          <div className="ms-Persona-imageArea imageArea-83">
-                            <div className="ms-Image ms-Persona-image image-86">
-                              <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="ms-Persona-details details-75">
-                          <div className="ms-Persona-primaryText primaryText-76">
-                            <div className="ms-TooltipHost host_a3f87333">
-                              
-                            </div>
-                          </div>
-                          <div className="ms-Persona-secondaryText secondaryText-77"></div>
-                          <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
-                          <div className="ms-Persona-optionalText optionalText-79"></div>
-                        </div>
-                      </div>
-                      <time className="posted-date comment-people-dg" title="February 12, 2019, 1:48 PM">February 12, 2019, 1:48 PM</time>
-                      <p className="comment-people-dg">
-                        <div className="ExternalClassC4DB25B9A99B4310A5D5E85FAEE2B543">Third comment!</div>
-                      </p>
-                      <button type="button" className="btn btn-default reply-btn pull-right" id="59_id">Reply</button>
-                      <div className="hideElem">
-                        <textarea className="form-control" name="replyToComments"></textarea>
-                        <br /><span className="hideElem">Please provide comments</span>
-                        <br />
-                        <button type="button" className="btn btn-default post-btn pull-right" id="59_id">Post Reply</button>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="child-replies">
-                        <div>
-                          <div className="ms-Persona ms-Persona--size24 root-74">
-                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
-                              <div className="ms-Persona-imageArea imageArea-83">
-                                <div className="ms-Image ms-Persona-image image-86">
-                                  <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="ms-Persona-details details-75">
-                              <div className="ms-Persona-primaryText primaryText-76">
-                                <div className="ms-TooltipHost host_a3f87333">
-
-                                </div>
-                              </div>
-                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
-                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
-                              <div className="ms-Persona-optionalText optionalText-79"></div>
-                            </div>
-                          </div>
-                          <time className="posted-date comment-people-dg" title="February 04, 2019, 1:25 PM">February 04, 2019, 1:25 PM</time>
-                        </div>
-                        <div>
-                          <p className="comment-people-dg">
-                            <div className="ExternalClassB36DCE621B1543E0B7143A198B74532D">hello</div>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="child-replies">
-                        <div>
-                          <div className="ms-Persona ms-Persona--size24 root-74">
-                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
-                              <div className="ms-Persona-imageArea imageArea-83">
-                                <div className="ms-Image ms-Persona-image image-86"><img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="ms-Persona-details details-75">
-                              <div className="ms-Persona-primaryText primaryText-76">
-                                <div className="ms-TooltipHost host_a3f87333">
-                                </div>
-                              </div>
-                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
-                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
-                              <div className="ms-Persona-optionalText optionalText-79"></div>
-                            </div>
-                          </div>
-                          <time className="posted-date comment-people-dg" title="December 03, 2018, 3:12 PM">December 03, 2018, 3:12 PM</time>
-                        </div>
-                        <div>
-                          <p className="comment-people-dg">
-                            <div className="ExternalClass9E5951F94B274C9F8ADCD6FE9D24273C">hi</div>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="child-replies">
-                        <div>
-                          <div className="ms-Persona ms-Persona--size24 root-74">
-                            <div className="ms-Persona-coin ms-Persona--size24 coin-81">
-                              <div className="ms-Persona-imageArea imageArea-83">
-                                <div className="ms-Image ms-Persona-image image-86" >
-                                  <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91" src="/_layouts/15/userphoto.aspx?size=S&amp;accountname=undefined" alt="" />
-                                </div>
-                              </div>
-                            </div>
-                            <div className="ms-Persona-details details-75">
-                              <div className="ms-Persona-primaryText primaryText-76">
-                                <div className="ms-TooltipHost host_a3f87333">
-                                 
-                                </div>
-                              </div>
-                              <div className="ms-Persona-secondaryText secondaryText-77"></div>
-                              <div className="ms-Persona-tertiaryText tertiaryText-78"></div>
-                              <div className="ms-Persona-optionalText optionalText-79"></div>
-                            </div>
-                          </div>
-                          <time className="posted-date comment-people-dg" title="November 29, 2018, 9:49 PM">November 29, 2018, 9:49 PM</time>
-                        </div>
-                        <div>
-                          <p className="comment-people-dg">
-                            <div className="ExternalClassD18552FF8DF346F2A0C820F01B661CD1">reply works..</div>
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                  </div>
-                </div>
-              </div>
-            </div>*/}
+            
          
           <div className="col-md-4 col-xs-12 rightContent">
             <div className="col-md-12 padding0">
@@ -581,14 +446,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     return(
                     <div className="col-md-12 compownerSection">
                     <div className="col-md-3 col-xs-1 padding0">
-                      <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic" src={"/_layouts/15/userphoto.aspx?size=S&amp;accountname="+d.UserName} alt="" />
+                        <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic" src={"/_layouts/15/userphoto.aspx?size=S&amp;accountname="+d.UserName} alt="" />
                     </div>
                     <div className="col-md-9 col-xs-11 padding0">
                       <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
                       <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
                       <span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
                       <span className="col-md-3 col-xs-3 compownerEmailField">Email: </span>
-                      <a className="col-md-9 col-xs-9 compownerEmail">{d.Email}</a>
+                      <a className="col-md-9 col-xs-9 compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a>
                     </div>
                   </div>);
                 }
