@@ -21,8 +21,10 @@
     "@types/react-dom": "15.5.6",
     "@types/webpack-env": "1.13.1",
     "jquery": "^3.3.1",
+    "moment": "^2.24.0",
     "react": "15.6.2",
     "react-dom": "15.6.2",
+    "react-moment": "^0.8.4",
     "simple-flex": "0.0.4",
     "simple-flexbox": "^1.2.0",
     "sp-pnp-js": "^3.0.10"

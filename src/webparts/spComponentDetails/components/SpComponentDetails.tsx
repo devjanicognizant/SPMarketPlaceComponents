@@ -5,6 +5,7 @@ import { escape } from '@microsoft/sp-lodash-subset';
 import pnp, { Item } from 'sp-pnp-js';
 import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
+import Moment from 'react-moment';
 
 
 // Interface representing the state of component details webpart
@@ -26,7 +27,8 @@ export interface ISpComponentDetailsState {
     "TechnologyStack":any[],
     "FavoriteAssociates": "",
     "LikedById": any[],
-    "LikesCount": number
+    "LikesCount": number,
+    "Created":any
   };
   // Hold current user details
   currentUser: {
@@ -62,7 +64,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "TechnologyStack":[],
         "FavoriteAssociates": "",
         "LikedById": [],
-        "LikesCount": 0
+        "LikesCount": 0,
+        "Created":new Date()
       },
       currentUser: {
         "Id": 0,
@@ -96,7 +99,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     this.id= queryParameters.getValue("ComponentID");
-    //this.id="6";
+    this.id="35";
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(this.id))
@@ -112,7 +115,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentFeatures/Title"
         , "TechnologyStack/Title"
         , "FavoriteAssociates"
-        , "LikedBy/Id", "LikedById", "LikesCount")
+        , "LikedBy/Id", "LikedById", "LikesCount","Created")
       .get()
       .then((data: any) => {
          console.log(data);
@@ -179,8 +182,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     if (this.state.item.DemoUrl != null) {
       // Show demo link
       return (
-        <button className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Component Demo</a></button>
-        // <p className={styles.rcorner}><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Demo</a></p>
+					<a  target="_blank" href={this.state.item.DemoUrl.Url} className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i>&nbsp;View Component Demo</a>
+        // <button className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Component Demo</a></button>
       );
     }
     else {
@@ -248,25 +251,71 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
    // Make a service call to get component owner details by Id
    private getCompOwnerDetails(ownerId) {
     var reactHandler = this;
-    pnp.sp.web.siteUsers.getById(ownerId).get().then(function(result) {
-      console.log("owner detail");
-      console.log(result);
-      reactHandler.state.componentOwnerDetails.push(result);
-          console.log(reactHandler.state.componentOwnerDetails);
-          if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
-            var compOwners = reactHandler.state.componentOwnerDetails;
-            reactHandler.setState({
-              // Set the returned user object to state
-              componentOwnerDetails : compOwners
-            });
-          }
+    pnp.sp.web.siteUsers.getById(ownerId).get().then(function(user) {
+      pnp.sp.profiles.getPropertiesFor(user.LoginName).then(function(result) {
+          console.log(result);
+          var userProfle = result.UserProfileProperties;
+          var owner:any = {};
+          owner.Title = userProfle.filter((e) => e.Key === "LastName")[0].Value+", "+userProfle.filter((e) => e.Key === "FirstName")[0].Value;
+          owner.Designation = userProfle.filter((e) => e.Key === "Title")[0].Value;
+          owner.Department = userProfle.filter((e) => e.Key === "Department")[0].Value;
+          owner.Email = result.Email;
+
+          reactHandler.state.componentOwnerDetails.push(owner);
+              console.log(reactHandler.state.componentOwnerDetails);
+              if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
+                var compOwners = reactHandler.state.componentOwnerDetails;
+                reactHandler.setState({
+                  // Set the returned user object to state
+                  componentOwnerDetails : compOwners
+                });
+              }
+        })
+        .catch((error) => {
+          LogManager.logException(error
+            , "Error occured while fetching component owner details."
+            , "Cpmponent Details"
+            , "getCompOwnerDetails");
+        });
     })
     .catch((error) => {
-      LogManager.logException(error
-        , "Error occured while fetching component owner details."
-        , "Cpmponent Details"
-        , "getCompOwnerDetails");
-    });
+        LogManager.logException(error
+          , "Error occured while fetching component owner details."
+          , "Cpmponent Details"
+          , "getCompOwnerDetails");
+      });
+
+
+
+
+
+    // pnp.sp.web.siteUsers.getById(ownerId).get().then(function(result) {
+    //   console.log("owner detail");
+    //   console.log(result);
+    //   pnp.sp.profiles.myProperties.get().then(function(result) {
+    //     var props = result.UserProfileProperties;
+    //     console.log(props);
+    //   });
+    //   pnp.sp.profiles.getPropertiesFor(result.LoginName).then(function(desigResult) {
+    //     console.log(desigResult);
+    //     result.Designation = desigResult.UserProfileProperties.Title;
+    //     reactHandler.state.componentOwnerDetails.push(result);
+    //         console.log(reactHandler.state.componentOwnerDetails);
+    //         if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
+    //           var compOwners = reactHandler.state.componentOwnerDetails;
+    //           reactHandler.setState({
+    //             // Set the returned user object to state
+    //             componentOwnerDetails : compOwners
+    //           });
+    //         }
+    //   });
+    // })
+    // .catch((error) => {
+    //   LogManager.logException(error
+    //     , "Error occured while fetching component owner details."
+    //     , "Cpmponent Details"
+    //     , "getCompOwnerDetails");
+    // });
   }
 
   // Return different markup when user has already set the component as favourite
@@ -405,7 +454,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <div className="col-md-2 col-sm-3 topRightTitle padding0">
                 <div className="lFloat">
                   <label className="caption">Date:</label>
-                  <label className="description">24.06.2018</label>
+                  <label className="description">
+                    <Moment format="DD.MM.YYYY">
+                       {this.state.item.Created}
+                    </Moment>
+                    {/*{this.state.item.Created.toLocaleDateString()}*/}
+                    </label>
                 </div>
                 {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?<span className="pipe">|</span>:""}
                 <div className="lFloat">
@@ -452,8 +506,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                       <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
                       <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
                       <span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
-                      <span className="col-md-3 col-xs-3 compownerEmailField">Email: </span>
-                      <a className="col-md-9 col-xs-9 compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a>
+                      <span className="col-md-12 col-xs-12"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span>
                     </div>
                   </div>);
                 }
