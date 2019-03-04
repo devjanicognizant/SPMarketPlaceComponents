@@ -1,3 +1,5 @@
+import { IListServce } from "../../commonServices/IListService";
+
 export interface ISpComponentDetailsProps {
   inventoryListName: string;
   artifactsListName: string;
@@ -6,4 +8,5 @@ export interface ISpComponentDetailsProps {
   activeLikeImgUrl: string;
   inactiveLikeImgUrl: string;
   siteurl: string;
+  listService: IListServce;
 }

@@ -10,6 +10,7 @@ import {
 import * as strings from 'SpComponentDetailsWebPartStrings';
 import SpComponentDetails from './components/SpComponentDetails';
 import { ISpComponentDetailsProps } from './components/ISpComponentDetailsProps';
+import { ListMock } from '../commonServices/ListMock';
 
 // Interface representing webpart properties
 export interface ISpComponentDetailsWebPartProps {
@@ -38,7 +39,8 @@ export default class SpComponentDetailsWebPart extends BaseClientSideWebPart<ISp
         activeLikeImgUrl: this.properties.activeLikeImgUrl,
         // Webpart property to configure like image url when user has already liked the component
         inactiveLikeImgUrl: this.properties.inactiveLikeImgUrl,
-        siteurl: this.context.pageContext.web.absoluteUrl
+        siteurl: this.context.pageContext.web.absoluteUrl,
+        listService: new ListMock()
       }
     );
 

@@ -6,6 +6,7 @@ import pnp, { Item } from 'sp-pnp-js';
 import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
 import Moment from 'react-moment';
+import { ListItem } from '../../commonServices/ListItem';
 
 
 // Interface representing the state of component details webpart
@@ -42,6 +43,7 @@ export interface ISpComponentDetailsState {
 
   // Inventory list Guid
   inventoryListId: string;
+  id:string;
 }
 // React enabled component class implementing property and state interfaces
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -74,11 +76,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "Title": ""
       },
       componentOwnerDetails:[{"Title":"","Email":""}],
-      inventoryListId:""
+      inventoryListId:"",
+      id:""
     };
   }
   // To store the component id coming from query string
-  private id: string;
+ // private id: string;
   // Fetch the component details
   // Fetch the current user details
   // Fetch the component document set as well as artifact files
@@ -98,11 +101,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
 
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
-    this.id= queryParameters.getValue("ComponentID");
-    this.id="35";
+    var id = queryParameters.getValue("ComponentID");
+    id="35";
+    console.log(id);
+    this.setState({id: id});
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
-      .getById(Number(this.id))
+      .getById(Number(id))
       .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack", "LikedBy")
       .select("ComponentTitle"
         , "ComponentDescription"
@@ -139,7 +144,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         // Service call Get artifact document set for the component
         pnp.sp.web.lists.getByTitle(artifactListName).items
           .expand("Folder", "Folder/ComponentID", "Folder/ComponentID/Id")
-          .filter(`ComponentID/Id eq ` + this.id)
+          .filter(`ComponentID/Id eq ` + this.state.id)
           .get()
           .then((folders: any[]) => {
             if (folders.length > 0) {
@@ -345,7 +350,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           return (
             <p className="rcorner" id="pFavActive">
               <span className={styles.topAlign}>Add to favourite </span>
-              <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.id + "', 'imgFav','" + this.state.inventoryListId + "');"}>
+              <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.state.id + "', 'imgFav','" + this.state.inventoryListId + "');"}>
                 <img id="imgFav"
                   src={favActiveImgUrl}></img>
               </a>
@@ -363,6 +368,58 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
 
   // Return different markup when user has already likes the component
   // and different markup when user is yet to like the component
+  private renderLike() {
+     // Determine like image url
+     var siteUrl = this.props.siteurl;
+     var likeActiveImgUrl = siteUrl +"/siteassets/images/like-red.png";
+     var likeInactiveImgUrl = siteUrl +"/siteassets/images/unlike-red.png";
+
+    // Initially hide both like and unlike divs
+    var likeClass = "hide";
+    var unlikeClass = "hide";
+    // Set the css class based on the status whether user liked the component or not
+    if (this.state.item.LikedById != null
+      && this.state.item.LikedById.indexOf(this.state.currentUser.Id) != -1) {
+      unlikeClass = "show";
+      
+    }
+    else {
+      likeClass = "show";
+    }
+    // Build the markup applying appropriate css classes
+    // Call javascript method on icon click event to like or unlike the component
+    // Put a common area to show no of likes for the coponent
+    return (
+      <div className="item-content-like-symbol">
+        <div className={likeClass} id={"divLike"}>
+          <a href="#" onClick={this.onSetLike.bind(this)}>
+            <img src={likeActiveImgUrl} id="like-red" />
+          </a>
+        </div>
+        <div className={unlikeClass} id={"divUnlike"}>
+          <a href="#" onClick={this.onSetLike.bind(this)}>
+            <img src={likeInactiveImgUrl} id="unlike-red" />
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+   public onSetLike = (): void => {
+    // _items[index].likesCount = _items[index].likesCount +1;
+    //  this.setState({ listItems: _items});
+    //this._LoadFavourites(this.state.selectedOrderBy);
+    console.log("fired like!")
+    var likedBy = (this.state.item.LikedById != null)?this.state.item.LikedById:[];
+    this.props.listService.setLikes(this.props.inventoryListName,this.state.id, this.state.item.LikedById, this.state.item.LikesCount, this.state.currentUser.Id).then((result: any) => {
+      this.state.item.LikedById = (result.LikedById != null && result.LikedById.results != null)?result.LikedById.results:result.LikedById;
+      this.state.item.LikesCount = result.LikesCount;
+      this.setState({item:this.state.item});
+    });
+  };
+
+  /*// Return different markup when user has already likes the component
+  // and different markup when user is yet to like the componen           t
   private renderLike() {
      // Determine like image url
      var siteUrl = this.props.siteurl;
@@ -403,7 +460,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         </p>
       </div>
     );
-  }
+  }*/
 
   // Build and render the final markup to show on the page
   // simple-flexbox module is used to build row column design
@@ -482,7 +539,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     <label> Add to favorite</label>						
                   </div>
                   <div className="col-md-6 paddingLeft0 likeSection">				
-                    <span className="likeIcon"></span>						
+                   {this.renderLike()}					
                     <label> Like</label>						
                   </div>
                 </div>

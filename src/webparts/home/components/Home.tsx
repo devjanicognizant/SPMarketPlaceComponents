@@ -253,10 +253,7 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
        this._LoadFavourites(this.state.selectedOrderBy);
     });
   };
-   public onSetUnlike = (index, item): void => {
-    // _items[index].likesCount = _items[index].likesCount -1;
-   
-  };
+  
  public onLikeSort = (): void => {
    
     this._LoadFavourites("Most Liked");
