@@ -99,24 +99,51 @@ export class ListMock implements IListServce {
          });
     } 
 
-    public setFavourites(listTitle:string,itemId:number,favouritesAssociates:any[], currentUserId: any):any
+    public setFavourites(listTitle:string,itemId:number,favouritesAssociates:string, currentUserId: any):any
     {
-        let newfavouriteAssociates:any[]=[];
-        if(favouritesAssociates != undefined && favouritesAssociates.filter(a=> a == currentUserId).length >0)
-        { 
-            newfavouriteAssociates=newfavouriteAssociates.filter(a => a != currentUserId)
-        }
-        else
-        {
-            newfavouriteAssociates=(newfavouriteAssociates != undefined)?newfavouriteAssociates:[]
-            newfavouriteAssociates.push(currentUserId)
-        }
-        let itemInformation=
-        { 
-            FavouritesAssociates:newfavouriteAssociates.toString()
-        };
-        this.updateListItem(listTitle,itemId,itemInformation);
-        return itemInformation;
+        return new Promise<any>((resolve:any) => { 
+            let newfavouriteAssociates:string="";
+            var add = false;
+            var remove = false;
+            if(favouritesAssociates != undefined && favouritesAssociates.indexOf(currentUserId) !=-1)
+            { 
+                newfavouriteAssociates=favouritesAssociates.replace(currentUserId,"");
+                remove = true;
+            }
+            else
+            {
+                add = true;
+                newfavouriteAssociates=favouritesAssociates+" "+currentUserId;
+            }
+            let itemInformation=
+            { 
+                FavoriteAssociates:newfavouriteAssociates
+            };
+            this.updateListItem(listTitle,itemId,itemInformation);
+            var favObj;
+            if(add){
+                if(localStorage["CognizantCDBMP.favorites"] === undefined){
+                    favObj = {"userID":currentUserId, "favID":[{"id":itemId.toString()}]};        
+                }
+                else{
+                    favObj = JSON.parse(localStorage["CognizantCDBMP.favorites"]);
+                    if(favObj.userID === currentUserId){
+                        favObj.favID.push({"id":itemId.toString()});
+                    }else{
+                        favObj = {"userID":currentUserId, "favID":[{"id":itemId.toString()}]};
+                    }
+                }
+               
+            }
+            if(remove && localStorage["CognizantCDBMP.favorites"] !== undefined){
+                favObj = JSON.parse(localStorage["CognizantCDBMP.favorites"]);
+                 if(favObj.userID === currentUserId){
+                     favObj.favID = favObj.favID.filter( a => a.id != itemId.toString())
+                 }
+            }
+            localStorage["CognizantCDBMP.favorites"] = JSON.stringify(favObj);
+            resolve(itemInformation);
+         });
     } 
   }
 

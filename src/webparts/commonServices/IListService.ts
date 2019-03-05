@@ -8,6 +8,6 @@ export interface IListServce {
     getAll(options): Promise<Array<ListItem>>;
     getCurrentUserDetails(): Promise<any>;
     setLikes(listTitle,itemIany,likedByUsers,likesCount, currentUserId):Promise<any>;
-    setFavourites(listTitle:string,itemId:number,favouritesAssociates:any[], currentUserId: any):any;
+    setFavourites(listTitle:string,itemId:number,favouritesAssociates:string, currentUserId: any):any;
     getAllRefByCategory(options): Promise<Array<ListItem>>;
 }

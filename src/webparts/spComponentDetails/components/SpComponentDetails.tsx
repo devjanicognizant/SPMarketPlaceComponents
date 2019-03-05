@@ -29,14 +29,17 @@ export interface ISpComponentDetailsState {
     "FavoriteAssociates": "",
     "LikedById": any[],
     "LikesCount": number,
-    "Created":any
+    "Created":any,
+    "ComponentCategory":any,
+    "ComponentSubCategory":any
   };
   // Hold current user details
   currentUser: {
     "Id": number,
     "Email": string,
     "LoginName": string,
-    "Title": string
+    "Title": string,
+    "UserPrincipalName": string
   };
   // Component owner details - required for fetching the email id
   componentOwnerDetails:any[];
@@ -67,13 +70,16 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "FavoriteAssociates": "",
         "LikedById": [],
         "LikesCount": 0,
-        "Created":new Date()
+        "Created":new Date(),
+        "ComponentCategory":"",
+        "ComponentSubCategory":""
       },
       currentUser: {
         "Id": 0,
         "Email": "",
         "LoginName": "",
-        "Title": ""
+        "Title": "",
+        "UserPrincipalName": ""
       },
       componentOwnerDetails:[{"Title":"","Email":""}],
       inventoryListId:"",
@@ -102,13 +108,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     var id = queryParameters.getValue("ComponentID");
-    id="35";
+    //id="55";
     console.log(id);
     this.setState({id: id});
     // Service call to fetch the component details by component id
     pnp.sp.web.lists.getByTitle(inventoryList).items
       .getById(Number(id))
-      .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack", "LikedBy")
+      .expand("ComponentOwner", "ComponentFeatures", "ComponentFeatures", "TechnologyStack", "LikedBy","ComponentCategory","ComponentSubCategory")
       .select("ComponentTitle"
         , "ComponentDescription"
         , "ShortDescription"
@@ -120,7 +126,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentFeatures/Title"
         , "TechnologyStack/Title"
         , "FavoriteAssociates"
-        , "LikedBy/Id", "LikedById", "LikesCount","Created")
+        , "LikedBy/Id", "LikedById", "LikesCount"
+        , "Created"
+        , "ComponentCategory/Title"
+        , "ComponentSubCategory/Title")
       .get()
       .then((data: any) => {
          console.log(data);
@@ -135,7 +144,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           data.LikesCount = 0;
         }
         data.ComponentDescriptionContent = { __html: data.ComponentDescription };
-        data.TechnologyStack = data.TechnologyStack;
+       // data.TechnologyStack = data.TechnologyStack;
         reactHandler.setState({
           // Assign returned list item data to state
           item: data
@@ -323,7 +332,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // });
   }
 
-  // Return different markup when user has already set the component as favourite
+  /*// Return different markup when user has already set the component as favourite
   // and different markup when user is yet to set it as favourite
   private renderFavouriteImage() {
     // Get user's login name without membership detials part
@@ -364,7 +373,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       );
       
       }
-  }
+  }*/
 
   // Return different markup when user has already likes the component
   // and different markup when user is yet to like the component
@@ -462,6 +471,62 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     );
   }*/
 
+   // Return different markup when user has already likes the component
+  // and different markup when user is yet to like the component
+  private renderFavourite() {
+     // Determine fav image url
+     var siteUrl = this.props.siteurl;
+    // var favActiveImgUrl = siteUrl +"/siteassets/images/fav-red.png";
+    var favImgUrl = siteUrl +"/Style%20Library/Images/if_Star%20On_58612.png?csf=1";
+    var unFavImgUrl =  siteUrl +"/siteassets/images/unlike-red.png";
+
+    // Initially hide both fav and unfav divs
+    var favClass = "hide";
+    var unfavClass = "hide";
+    // Set the css class based on the status whether user favd the component or not
+    if (this.state.item.FavoriteAssociates != null
+      && this.state.item.FavoriteAssociates.indexOf(this.state.currentUser.UserPrincipalName) != -1) {
+      unfavClass = "show";
+       return(<img src={favImgUrl}  className="fav-image" onClick={this.onSetFavourite.bind(this)}/>)
+      
+    }
+    else {
+      favClass = "show";
+      return(<span className="starIcon" onClick={this.onSetFavourite.bind(this)}></span>)
+                 {/*<img src={unFavImgUrl} />*/}
+    }
+    // Build the markup applying appropriate css classes
+    // Call javascript method on icon click event to fav or unfav the component
+    // Put a common area to show no of favs for the coponent
+    /*return (
+      <div>
+        <div className={favClass} id={"divfav"}>
+          <a href="#" onClick={this.onSetFavourite.bind(this)}>
+           <span className="starIcon"></span>
+
+          </a>
+        </div>
+        <div className={unfavClass} id={"divUnfav"}>
+          <a href="#" onClick={this.onSetFavourite.bind(this)}>
+            <img src={favImgUrl}  className="fav-image"/>
+          </a>
+        </div>
+      </div>
+    );*/
+  }
+
+   public onSetFavourite = (): void => {
+    // _items[index].likesCount = _items[index].likesCount +1;
+    //  this.setState({ listItems: _items});
+    //this._LoadFavourites(this.state.selectedOrderBy);
+    console.log("fired favourite!")
+    var favBy = (this.state.item.FavoriteAssociates != null)?this.state.item.FavoriteAssociates:"";
+    this.props.listService.setFavourites(this.props.inventoryListName,Number(this.state.id), this.state.item.FavoriteAssociates, this.state.currentUser.UserPrincipalName).then((result: any) => {
+      this.state.item.FavoriteAssociates = result.FavoriteAssociates;
+      this.setState({item:this.state.item});
+    });
+  };
+
   // Build and render the final markup to show on the page
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
@@ -476,7 +541,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             <div className="col-md-12 topTitle paddingLeft0">
               <div className="col-md-10 col-sm-9 padding0 topLeftTitle">
                 <div className="padding0 lFloat">
-                  <label className="caption">Technology:</label>
+                  {/*<label className="caption">Technology:</label>
                   <label className="description">
                      {this.state.item.TechnologyStack.map((d, idx) => {
                        if(idx==0){
@@ -486,10 +551,16 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                          return ", " + (d.Title);
                        }
                     })}
-                  </label>
+                  </label>*/}
+                  <label className="caption">Category:</label>
+                   <label className="description">{this.state.item.ComponentCategory.Title}</label>
                 </div>
                 <span className="pipe">|</span>
                 <div className="padding0 lFloat">
+                  <label className="caption">Sub Category:</label>
+                   <label className="description">{this.state.item.ComponentSubCategory.Title}</label>
+                </div>
+                {/*<div className="padding0 lFloat">
                   <label className="caption">Feature:</label>
                   <label className="description">
                      {this.state.item.ComponentFeatures.map((d, idx) => {
@@ -501,12 +572,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                        }
                     })}
                     </label>
-                </div>
-                {/*<span className="pipe">|</span>
-                <div className="padding0 lFloat">
-                  <label className="caption">Business:</label>
-                  <label className="description">Business 2</label>
                 </div>*/}
+               
               </div>
               <div className="col-md-2 col-sm-3 topRightTitle padding0">
                 <div className="lFloat">
@@ -533,9 +600,59 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <h3>Description:</h3>
                   <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
                 </div>
+                
+                {
+                  (this.state.item.TechnologyStack.length>0)? (
+                    <div className="col-md-12 topTitle paddingLeft0 technoDiv">
+                      <div className="col-md-10 col-sm-9 padding0 topLeftTitle">
+                        <div className="padding0 lFloat">
+                          <h3>Technology:</h3>
+                          <ul>
+                            {this.state.item.TechnologyStack.map((d, idx) => {
+                            
+                              return (<li>{d.Title}</li>)
+                            
+                            })
+                            }
+                            
+                          </ul>
+                        </div>							
+                      </div>
+                    </div>
+                  ):("")
+                }
+
+                 {
+                  (this.state.item.ComponentFeatures.length>0)? (
+                    <div className="col-md-12 topTitle paddingLeft0 technoDiv">
+                      <div className="col-md-10 col-sm-9 padding0 topLeftTitle">
+                        <div className="padding0 lFloat">
+                          <h3>Feature:</h3>
+                          <ul>
+                            {this.state.item.ComponentFeatures.map((d, idx) => {
+                            
+                              return (<li>{d.Title}</li>)
+                            
+                            })
+                            }
+                            
+                          </ul>
+                        </div>							
+                      </div>
+                    </div>
+                  ):("")
+                }
+                {
+                  (this.state.item.ComponentLimitations != null && this.state.item.ComponentLimitations != "")? (				
+                    <div className="col-md-12 shortNote paddingLeft0">
+                      <h3>Limitations:</h3>
+                      <p>{this.state.item.ComponentLimitations}</p>
+                    </div>
+                  ):("")
+                }
                 <div className="col-md-6 addtoFav">
                   <div className="col-md-6 paddingLeft0 addFavSection">				
-                    <span className="starIcon"></span>						
+                    {this.renderFavourite()}							
                     <label> Add to favorite</label>						
                   </div>
                   <div className="col-md-6 paddingLeft0 likeSection">				
