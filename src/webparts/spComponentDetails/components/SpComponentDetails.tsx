@@ -274,11 +274,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           owner.Designation = userProfle.filter((e) => e.Key === "Title")[0].Value;
           owner.Department = userProfle.filter((e) => e.Key === "Department")[0].Value;
           owner.Email = result.Email;
+          owner.UserName = userProfle.filter((e) => e.Key === "UserName")[0].Value;
 
           reactHandler.state.componentOwnerDetails.push(owner);
-              console.log(reactHandler.state.componentOwnerDetails);
               if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
                 var compOwners = reactHandler.state.componentOwnerDetails;
+                console.log("comp owner details");
+                console.log(compOwners);
                 reactHandler.setState({
                   // Set the returned user object to state
                   componentOwnerDetails : compOwners
@@ -404,11 +406,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           <a href="#" onClick={this.onSetLike.bind(this)}>
             <img src={likeActiveImgUrl} id="like-red" />
           </a>
+          &nbsp;
         </div>
         <div className={unlikeClass} id={"divUnlike"}>
           <a href="#" onClick={this.onSetLike.bind(this)}>
             <img src={likeInactiveImgUrl} id="unlike-red" />
           </a>
+          &nbsp;
         </div>
       </div>
     );
@@ -487,7 +491,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     if (this.state.item.FavoriteAssociates != null
       && this.state.item.FavoriteAssociates.indexOf(this.state.currentUser.UserPrincipalName) != -1) {
       unfavClass = "show";
-       return(<img src={favImgUrl}  className="fav-image" onClick={this.onSetFavourite.bind(this)}/>)
+      //  return(<img src={favImgUrl}  className="fav-image" onClick={this.onSetFavourite.bind(this)}/>)
+      return(<span className="starFavIcon" onClick={this.onSetFavourite.bind(this)}></span>)
       
     }
     else {
@@ -552,12 +557,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                        }
                     })}
                   </label>*/}
-                  <label className="caption">Category:</label>
+                  <label className="caption">Category:&nbsp;</label>
                    <label className="description">{this.state.item.ComponentCategory.Title}</label>
                 </div>
                 <span className="pipe">|</span>
                 <div className="padding0 lFloat">
-                  <label className="caption">Sub Category:</label>
+                  <label className="caption">Sub Category:&nbsp;</label>
                    <label className="description">{this.state.item.ComponentSubCategory.Title}</label>
                 </div>
                 {/*<div className="padding0 lFloat">
@@ -577,7 +582,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               </div>
               <div className="col-md-2 col-sm-3 topRightTitle padding0">
                 <div className="lFloat">
-                  <label className="caption">Date:</label>
+                  <label className="caption">Date:&nbsp;</label>
                   <label className="description">
                     <Moment format="DD.MM.YYYY">
                        {this.state.item.Created}
@@ -653,7 +658,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 <div className="col-md-6 addtoFav">
                   <div className="col-md-6 paddingLeft0 addFavSection">				
                     {this.renderFavourite()}							
-                    <label> Add to favorite</label>						
+                    <label>&nbsp;Add to favorite</label>						
                   </div>
                   <div className="col-md-6 paddingLeft0 likeSection">				
                    {this.renderLike()}					
@@ -673,15 +678,17 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 if(index!=0){
                     return(
                     <div className="col-md-12 compownerSection">
-                    <div className="col-md-3 col-xs-1 padding0">
-                        <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic" src={"/_layouts/15/userphoto.aspx?size=S&amp;accountname="+d.UserName} alt="" />
-                    </div>
-                    <div className="col-md-9 col-xs-11 padding0">
-                      <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
-                      <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
-                      <span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
-                      <span className="col-md-12 col-xs-12"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span>
-                    </div>
+                      <div className="col-md-3 col-xs-1 padding0 owner-img">
+                          <img className="ms-Image-image is-loaded ms-Image-image--cover ms-Image-image--portrait is-fadeIn image-91 compownerPic" src={"https://outlook.office365.com/owa/service.svc/s/GetPersonaPhoto?email="+d.UserName} alt="" />
+                      </div>
+                      <div className="col-md-9 col-xs-11 padding0">
+                        <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
+                        <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
+                        {/*<span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
+                        <span className="col-md-12 col-xs-12"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span>*/}
+                      </div>
+                      <div className="col-md-12"><span className="col-md-12 col-xs-12 compownerUnit padding0">{d.Department} </span></div>
+                      <div className="col-md-12"><span className="col-md-12 col-xs-12 padding0"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span></div>
                   </div>);
                 }
               })
