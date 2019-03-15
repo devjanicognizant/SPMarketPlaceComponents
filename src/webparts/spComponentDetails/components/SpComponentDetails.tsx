@@ -93,7 +93,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     };
   }
   // To store the component id coming from query string
- // private id: string;
   // Fetch the component details
   // Fetch the current user details
   // Fetch the component document set as well as artifact files
@@ -208,7 +207,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       // Show demo link
       return (
 					<a  target="_blank" href={this.state.item.DemoUrl.Url} className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i>&nbsp;View Component Demo</a>
-        // <button className="col-md-12 btn btn-default"><i className="fa fa-chevron-right" aria-hidden="true"></i><a target="_blank" href={this.state.item.DemoUrl.Url} className={styles.link}>View Component Demo</a></button>
       );
     }
     else {
@@ -311,82 +309,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
           , "Cpmponent Details"
           , "getCompOwnerDetails");
       });
-
-
-
-
-
-    // pnp.sp.web.siteUsers.getById(ownerId).get().then(function(result) {
-    //   console.log("owner detail");
-    //   console.log(result);
-    //   pnp.sp.profiles.myProperties.get().then(function(result) {
-    //     var props = result.UserProfileProperties;
-    //     console.log(props);
-    //   });
-    //   pnp.sp.profiles.getPropertiesFor(result.LoginName).then(function(desigResult) {
-    //     console.log(desigResult);
-    //     result.Designation = desigResult.UserProfileProperties.Title;
-    //     reactHandler.state.componentOwnerDetails.push(result);
-    //         console.log(reactHandler.state.componentOwnerDetails);
-    //         if(reactHandler.state.componentOwnerDetails.length>= reactHandler.state.item.ComponentOwner.length){
-    //           var compOwners = reactHandler.state.componentOwnerDetails;
-    //           reactHandler.setState({
-    //             // Set the returned user object to state
-    //             componentOwnerDetails : compOwners
-    //           });
-    //         }
-    //   });
-    // })
-    // .catch((error) => {
-    //   LogManager.logException(error
-    //     , "Error occured while fetching component owner details."
-    //     , "Cpmponent Details"
-    //     , "getCompOwnerDetails");
-    // });
   }
 
-  /*// Return different markup when user has already set the component as favourite
-  // and different markup when user is yet to set it as favourite
-  private renderFavouriteImage() {
-    // Get user's login name without membership detials part
-    var userLoginName = this.state.currentUser.LoginName.split(/[| ]+/).pop();
-    // Determine the favourite image url
-    var siteUrl = this.props.siteurl;
-    var favActiveImgUrl = siteUrl + this.props.activeFavouriteImgUrl;
-    var favInactiveImgUrl = siteUrl + this.props.inactiveFavouriteImgUrl;
-
-    if (this.state.item.FavoriteAssociates != null && this.state.item.FavoriteAssociates.toLowerCase().indexOf(userLoginName) != -1) {
-      // Markup if user has already set the component as favourite
-      return (
-        <p className="rcornerDisabled" id="pFavInactive">
-          <span className={styles.topAlign}>Add to favourite </span>
-          <img id="imgFav"
-            src= {favInactiveImgUrl}>
-          </img>
-        </p>
-      );
-    }
-    else {
-      if(this.state.inventoryListId != ""){
-         // Markup if user is yet to set the component as favourite
-          return (
-            <p className="rcorner" id="pFavActive">
-              <span className={styles.topAlign}>Add to favourite </span>
-              <a href={"javascript:CognizantCDBMP.addToFavorite('" + this.state.id + "', 'imgFav','" + this.state.inventoryListId + "');"}>
-                <img id="imgFav"
-                  src={favActiveImgUrl}></img>
-              </a>
-            </p>
-          );
-      }
-      else  return (
-        <p className="rcornerDisabled" id="pFavInactive">
-          ERROR!!
-        </p>
-      );
-      
-      }
-  }*/
 
   // Return different markup when user has already likes the component
   // and different markup when user is yet to like the component
@@ -428,9 +352,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   }
 
    public onSetLike = (): void => {
-    // _items[index].likesCount = _items[index].likesCount +1;
-    //  this.setState({ listItems: _items});
-    //this._LoadFavourites(this.state.selectedOrderBy);
     console.log("fired like!")
     var likedBy = (this.state.item.LikedById != null)?this.state.item.LikedById:[];
     this.props.listService.setLikes(this.props.inventoryListName,this.state.id, this.state.item.LikedById, this.state.item.LikesCount, this.state.currentUser.Id).then((result: any) => {
@@ -439,50 +360,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       this.setState({item:this.state.item});
     });
   };
-
-  /*// Return different markup when user has already likes the component
-  // and different markup when user is yet to like the componen           t
-  private renderLike() {
-     // Determine like image url
-     var siteUrl = this.props.siteurl;
-     var likeActiveImgUrl = siteUrl + this.props.activeLikeImgUrl;
-     var likeInactiveImgUrl = siteUrl + this.props.inactiveLikeImgUrl;
-
-    // Initially hide both like and unlike divs
-    var likeClass = "hide";
-    var unlikeClass = "hide";
-    // Set the css class based on the status whether user liked the component or not
-    if (this.state.item.LikedById != null
-      && this.state.item.LikedById.indexOf(this.state.currentUser.Id) != -1) {
-      unlikeClass = "show";
-    }
-    else {
-      likeClass = "show";
-    }
-    // Build the markup applying appropriate css classes
-    // Call javascript method on icon click event to like or unlike the component
-    // Put a common area to show no of likes for the coponent
-    return (
-      <div>
-        <p id="pLike" className={[likeClass, styles.rcorner].join(" ")}>
-          <span className={styles.topAlign}>Like it! </span>
-          <a href={"javascript:SetLike(true,'" + this.props.inventoryListName + "'," + this.id + ")"}>
-            <img id="imgLike" className={styles.imgIcon}
-              src={likeActiveImgUrl}></img>
-          </a>
-          <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForLike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
-        </p>
-        <p id="pUnlike" className={[unlikeClass, styles.rcorner].join(" ")}>
-          <span className={styles.topAlign}>Unlike it! </span>
-          <a href={"javascript:SetLike(false,'" + this.props.inventoryListName + "'," + this.id + ")"}>
-            <img id="imgLike" className={styles.imgIcon}
-              src={likeInactiveImgUrl}></img>
-          </a>
-          <span className={styles.topAlign}> (</span><span className={[styles.topAlign, "likeCount"].join(" ")} id="likeCountForUnlike">{this.state.item.LikesCount}</span><span className={styles.topAlign}>)</span>
-        </p>
-      </div>
-    );
-  }*/
 
    // Return different markup when user has already likes the component
   // and different markup when user is yet to like the component
@@ -509,24 +386,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       return(<a className="favLink" href="#"><span className="starIcon" onClick={this.onSetFavourite.bind(this)}></span> <label>Add to favorite</label></a>)
                  {/*<img src={unFavImgUrl} />*/}
     }
-    // Build the markup applying appropriate css classes
-    // Call javascript method on icon click event to fav or unfav the component
-    // Put a common area to show no of favs for the coponent
-    /*return (
-      <div>
-        <div className={favClass} id={"divfav"}>
-          <a href="#" onClick={this.onSetFavourite.bind(this)}>
-           <span className="starIcon"></span>
-
-          </a>
-        </div>
-        <div className={unfavClass} id={"divUnfav"}>
-          <a href="#" onClick={this.onSetFavourite.bind(this)}>
-            <img src={favImgUrl}  className="fav-image"/>
-          </a>
-        </div>
-      </div>
-    );*/
   }
 
    public onSetFavourite = (): void => {
@@ -699,8 +558,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                       <div className="col-md-9 col-xs-11 padding0">
                         <span className="col-md-12 col-xs-12 compownerName">{d.Title} </span>
                         <span className="col-md-12 col-xs-12 compownerDesig">{d.Designation}  </span>
-                        {/*<span className="col-md-12 col-xs-12 compownerUnit">{d.Department} </span>
-                        <span className="col-md-12 col-xs-12"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span>*/}
                       </div>
                       <div className="col-md-12"><span className="col-md-12 col-xs-12 compownerUnit padding0">{d.Department} </span></div>
                       <div className="col-md-12"><span className="col-md-12 col-xs-12 padding0"><a className="compownerEmail" href={'mailto:' + d.Email}>{d.Email}</a></span></div>
@@ -709,19 +566,6 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               })
               
             }
-            
-            {/*<div className="col-md-12 compownerSection">
-              <div className="col-md-3 col-xs-1 padding0">
-                <span className="compownerPic">  </span>
-              </div>
-              <div className="col-md-9 col-xs-11 padding0">
-                <span className="col-md-12 col-xs-12 compownerName">Mike Jackson </span>
-                <span className="col-md-12 col-xs-12 compownerDesig">Sr. Architect  </span>
-                <span className="col-md-12 col-xs-12 compownerUnit">Cognizant Interactive </span>
-                <span className="col-md-3 col-xs-3 compownerEmailField">Email: </span>
-                <a className="col-md-9 col-xs-9 compownerEmail">Mike.jackson@cognizant.com</a>
-              </div>
-            </div>*/}
             
             <div className="col-md-12 compDemo">
               {this.renderDemoLink()}
@@ -740,73 +584,5 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     </div>
   </div>
  );
-
-
-
-
-
-      {/*<div>
-      { 
-        (this.state && this.state.item && this.state.item.ComponentTitle !="")?
-        <div className={styles.spComponentDetails}>
-          <Row className={styles.containerRow}>
-            <Column flexGrow={1} className={styles.left}>
-              <div>
-                <div id="divComponentTitle">
-                  <h1>{escape(this.state.item.ComponentTitle)}</h1>
-                </div>
-                <div id="divShortDescription">
-                  <p>{escape(this.state.item.ShortDescription)}</p>
-                </div>
-                <div id="divComponentDescriptionContent">
-                  <p dangerouslySetInnerHTML={this.state.item.ComponentDescriptionContent}></p>
-                </div>
-                <div id="divComponentImage">
-                  <img src={this.state.item.ComponentImage.Url} alt=""></img>
-                </div>
-              </div>
-            </Column>
-            <Column flexGrow={1} className={styles.middle}>
-            </Column>
-            <Column flexGrow={1} className={styles.right}>
-              <div>
-                <br />
-                <div id="divDemoUrl">
-                  {this.renderDemoLink()}
-                </div>
-                <br />
-                <div id="dicAdditionalResourcesHeader">
-                  <h2>
-                    Additional Resources
-                      </h2>
-                </div>
-                <div id="divAdditionalResources">
-                  <ul>
-                    {
-                      this.renderArtifacts()
-                    }
-                  </ul>
-                </div>
-                <br />
-                <div id="divComponentOwner">
-                  <p className={styles.rcorner}>
-                    <a href={'mailto:' + this.state.componentOwnerDetails.Email} className={styles.link}>Contact Component Owner</a>
-                  </p>
-                </div>
-              </div>
-              <br />
-              <div id="divFav">
-                {this.renderFavouriteImage()}
-              </div>
-              <br />
-              <div id="divLike">
-                {this.renderLike()}
-              </div>
-            </Column>
-          </Row>
-        </div>
-        :<div>Loading component details. Please wait...</div>
-      }
-      </div>*/}
-  }
+}
 }
