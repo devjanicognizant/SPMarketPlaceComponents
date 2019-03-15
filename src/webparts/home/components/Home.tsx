@@ -168,8 +168,8 @@ export default class Home extends React.Component<IHomeProps, IHomeState> {
                                 <div className="item-content">
                                   <div className="item-content-text">
                                     <a href={redirectUrl+"?ComponentID="+listItem.id}>
-                                          <p className="item-p"> {listItem.title.length>25?listItem.title.slice(0,25)+"...": listItem.title}  </p>
-                                          <p>{listItem.shortDescription.length>120?listItem.shortDescription.slice(0,120)+"...": listItem.shortDescription}</p>
+                                          <p className="item-p" title={listItem.title}> {listItem.title.length>45?listItem.title.slice(0,45)+"...": listItem.title}  </p>
+                                          <p className="item-pdesc" title={listItem.shortDescription}>{listItem.shortDescription.length>150?listItem.shortDescription.slice(0,150)+"...": listItem.shortDescription}</p>
                                     </a>
                                   </div>
                                   {this.renderLike(listItem, index)}

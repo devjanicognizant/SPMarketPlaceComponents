@@ -72,6 +72,43 @@ export class ListMock implements IListServce {
         .then(i => {console.log(i);})
         .catch((error)=>{console.log(error)})
     }
+    public setDownload(listTitle:string,itemId:number,downloadAssociates:string,downloadCount:Number, currentUserId: any):any
+    {
+        return new Promise<any>((resolve:any) => { 
+            let itemInformation=
+            { 
+                DownloadAssociates: downloadAssociates,
+                DownloadCount: downloadCount
+            };
+            if(downloadAssociates == undefined || downloadAssociates.indexOf(currentUserId) ==-1)
+            { 
+                let newDownloadAssociates:string=downloadAssociates.trim()+" "+currentUserId;
+                let newDownloadCount = newDownloadAssociates.trim().split(" ").length;
+                itemInformation=
+                { 
+                    DownloadAssociates: newDownloadAssociates,
+                    DownloadCount: newDownloadCount
+                };
+                this.updateListItem(listTitle,itemId,itemInformation);
+                var downloadObj;
+                if(localStorage["CognizantCDBMP.downloads"] === undefined){
+                    downloadObj = {"userID":currentUserId, "downloadID":[{"id":itemId.toString()}]};        
+                }
+                else{
+                    downloadObj = JSON.parse(localStorage["CognizantCDBMP.downloads"]);
+                    if(downloadObj.userID === currentUserId){
+                        downloadObj.downloadID.push({"id":itemId.toString()});
+                    }else{
+                        downloadObj = {"userID":currentUserId, "downloadID":[{"id":itemId.toString()}]};
+                    }
+                }
+           
+                localStorage["CognizantCDBMP.downloads"] = JSON.stringify(downloadObj);
+            }
+
+             resolve(itemInformation);
+         });
+    } 
 
     public setLikes(listTitle:any,itemId:any,likedByUsers:any[],likesCount:any, currentUserId: any):any
     {

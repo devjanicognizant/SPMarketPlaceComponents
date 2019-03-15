@@ -31,7 +31,9 @@ export interface ISpComponentDetailsState {
     "LikesCount": number,
     "Created":any,
     "ComponentCategory":any,
-    "ComponentSubCategory":any
+    "ComponentSubCategory":any,
+    "DownloadCount":any,
+    "DownloadAssociates": ""
   };
   // Hold current user details
   currentUser: {
@@ -47,6 +49,7 @@ export interface ISpComponentDetailsState {
   // Inventory list Guid
   inventoryListId: string;
   id:string;
+  artifactDocSetId:any;
 }
 // React enabled component class implementing property and state interfaces
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -72,7 +75,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "LikesCount": 0,
         "Created":new Date(),
         "ComponentCategory":"",
-        "ComponentSubCategory":""
+        "ComponentSubCategory":"",
+        "DownloadCount":0,
+        "DownloadAssociates": ""
       },
       currentUser: {
         "Id": 0,
@@ -83,7 +88,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       },
       componentOwnerDetails:[{"Title":"","Email":""}],
       inventoryListId:"",
-      id:""
+      id:"",
+      artifactDocSetId:0
     };
   }
   // To store the component id coming from query string
@@ -129,7 +135,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "LikedBy/Id", "LikedById", "LikesCount"
         , "Created"
         , "ComponentCategory/Title"
-        , "ComponentSubCategory/Title")
+        , "ComponentSubCategory/Title"
+        , "DownloadCount"
+        , "DownloadAssociates")
       .get()
       .then((data: any) => {
          console.log(data);
@@ -159,6 +167,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
             if (folders.length > 0) {
               // Get the folder relative url for the document set
               var artifactLocationRelativeUrl = folders[0].Folder.ServerRelativeUrl;
+              console.log("artifact doc set details");
+              console.log(folders[0]);
+               this.setState({artifactDocSetId: folders[0].Id});
               // Service call to fetch the files from the document set
               pnp.sp.web.getFolderByServerRelativeUrl(artifactLocationRelativeUrl).files.get()
                 .then((documents: any[]) => {
@@ -403,16 +414,14 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     return (
       <div className="item-content-like-symbol">
         <div className={likeClass} id={"divLike"}>
-          <a href="#" onClick={this.onSetLike.bind(this)}>
-            <img src={likeActiveImgUrl} id="like-red" />
+          <a href="#" onClick={this.onSetLike.bind(this)} className="likeLink">
+            <img src={likeActiveImgUrl} id="like-red" /> <label>Like</label>	
           </a>
-          &nbsp;
         </div>
         <div className={unlikeClass} id={"divUnlike"}>
-          <a href="#" onClick={this.onSetLike.bind(this)}>
-            <img src={likeInactiveImgUrl} id="unlike-red" />
+          <a href="#" onClick={this.onSetLike.bind(this)} className="likeLink">
+            <img src={likeInactiveImgUrl} id="unlike-red" /><label>Like</label>	
           </a>
-          &nbsp;
         </div>
       </div>
     );
@@ -492,12 +501,12 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       && this.state.item.FavoriteAssociates.indexOf(this.state.currentUser.UserPrincipalName) != -1) {
       unfavClass = "show";
       //  return(<img src={favImgUrl}  className="fav-image" onClick={this.onSetFavourite.bind(this)}/>)
-      return(<span className="starFavIcon" onClick={this.onSetFavourite.bind(this)}></span>)
+      return(<a className="favLink" href="#"><span className="starFavIcon" onClick={this.onSetFavourite.bind(this)}></span> <label>Add to favorite</label></a>)
       
     }
     else {
       favClass = "show";
-      return(<span className="starIcon" onClick={this.onSetFavourite.bind(this)}></span>)
+      return(<a className="favLink" href="#"><span className="starIcon" onClick={this.onSetFavourite.bind(this)}></span> <label>Add to favorite</label></a>)
                  {/*<img src={unFavImgUrl} />*/}
     }
     // Build the markup applying appropriate css classes
@@ -532,9 +541,21 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     });
   };
 
+   public onDownload = (): void => {
+    console.log("fired download!")
+    var downloadedBy = (this.state.item.DownloadAssociates != null)?this.state.item.DownloadAssociates:"";
+    var downloadCount = (this.state.item.DownloadCount != null)?this.state.item.DownloadCount:0
+    this.props.listService.setDownload(this.props.inventoryListName,Number(this.state.id), downloadedBy,downloadCount, this.state.currentUser.UserPrincipalName).then((result: any) => {
+      this.state.item.DownloadAssociates = result.DownloadAssociates;
+      this.state.item.DownloadCount = result.DownloadCount;
+      this.setState({item:this.state.item});
+    });
+  };
+
   // Build and render the final markup to show on the page
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
+    var downloadHandler = "javascript:OfficeDevPnP.Core.RibbonManager.invokeCommand('DownloadAllAsZip',null,'ad60af3d-e82b-4f47-9bc3-f5027165d7de',"+this.state.artifactDocSetId+",'"+this.state.item.ComponentTitle+"');";
     return (
     <div className="main-content">
 		  <div className="content-container"> 
@@ -544,19 +565,9 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
               <h3 className="">{escape(this.state.item.ComponentTitle)}</h3>
             </div>
             <div className="col-md-12 topTitle paddingLeft0">
-              <div className="col-md-10 col-sm-9 padding0 topLeftTitle">
+              <div className="col-md-8 col-sm-8 padding0 topLeftTitle">
                 <div className="padding0 lFloat">
-                  {/*<label className="caption">Technology:</label>
-                  <label className="description">
-                     {this.state.item.TechnologyStack.map((d, idx) => {
-                       if(idx==0){
-                        return (d.Title);
-                       }
-                       else{
-                         return ", " + (d.Title);
-                       }
-                    })}
-                  </label>*/}
+                 
                   <label className="caption">Category:&nbsp;</label>
                    <label className="description">{this.state.item.ComponentCategory.Title}</label>
                 </div>
@@ -565,22 +576,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                   <label className="caption">Sub Category:&nbsp;</label>
                    <label className="description">{this.state.item.ComponentSubCategory.Title}</label>
                 </div>
-                {/*<div className="padding0 lFloat">
-                  <label className="caption">Feature:</label>
-                  <label className="description">
-                     {this.state.item.ComponentFeatures.map((d, idx) => {
-                       if(idx==0){
-                        return (d.Title);
-                       }
-                       else{
-                         return ", " + (d.Title);
-                       }
-                    })}
-                    </label>
-                </div>*/}
+               
                
               </div>
-              <div className="col-md-2 col-sm-3 topRightTitle padding0">
+              <div className="col-md-4 col-sm-4 topRightTitle padding0">
                 <div className="lFloat">
                   <label className="caption">Date:&nbsp;</label>
                   <label className="description">
@@ -591,11 +590,20 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     </label>
                 </div>
                 {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?<span className="pipe">|</span>:""}
+                {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?
                 <div className="lFloat">
                   <label className="description">
-                    {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?this.state.item.LikesCount:""} {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?Number(this.state.item.LikesCount)>1?"Likes":"Like":""}
+                    {this.state.item.LikesCount} {Number(this.state.item.LikesCount)>1?"Likes":"Like"}
                     </label>					
-                </div>
+                </div>:""}
+
+                 {(this.state.item.DownloadCount!=null && Number(this.state.item.DownloadCount)>0)?<span className="pipe">|</span>:""}
+                {(this.state.item.DownloadCount!=null && Number(this.state.item.DownloadCount)>0)?
+                <div className="lFloat">
+                  <label className="description">
+                    {this.state.item.DownloadCount} {Number(this.state.item.DownloadCount)>1?"Downloads":"Download"}
+                    </label>					
+                </div>:""}
             </div>
           </div> 	        
           <div className="col-md-12 noteContent paddingLeft0 ">
@@ -655,14 +663,21 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     </div>
                   ):("")
                 }
-                <div className="col-md-6 addtoFav">
-                  <div className="col-md-6 paddingLeft0 addFavSection">				
+                <div className="col-md-8 addtoFav">
+                  <div className="col-md-4 paddingLeft0 addFavSection">				
                     {this.renderFavourite()}							
-                    <label>&nbsp;Add to favorite</label>						
+                   						
                   </div>
-                  <div className="col-md-6 paddingLeft0 likeSection">				
-                   {this.renderLike()}					
-                    <label> Like</label>						
+                  <div className="col-md-2 paddingLeft0 likeSection">
+                   {this.renderLike()}										
+                  </div>
+                  <div className="col-md-4 paddingLeft0 likeSection">                      
+                      <a href={downloadHandler} onClick={this.onDownload.bind(this)}>
+                      <i className="ms-Icon ms-Icon--Download x-hidden-focus" title="Download" aria-hidden="true"></i>
+                      <label>Download</label>
+                      </a>
+                      
+                    
                   </div>
                 </div>
               </div>
