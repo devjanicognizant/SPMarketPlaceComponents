@@ -113,7 +113,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     var id = queryParameters.getValue("ComponentID");
-    //id="55";
+    //id="39";
     console.log(id);
     this.setState({id: id});
     // Service call to fetch the component details by component id
@@ -414,7 +414,11 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
   // Build and render the final markup to show on the page
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
-    var downloadHandler = "javascript:OfficeDevPnP.Core.RibbonManager.invokeCommand('DownloadAllAsZip',null,'ad60af3d-e82b-4f47-9bc3-f5027165d7de',"+this.state.artifactDocSetId+",'"+this.state.item.ComponentTitle+"');";
+    let fileName:string = this.state.item.ComponentTitle;
+    //replace the character which are not allowed for file name as underscore(_)
+   // fileName = fileName.replace('/[/\\?%*:|"<>]/g', '-');
+
+    var downloadHandler = "javascript:OfficeDevPnP.Core.RibbonManager.invokeCommand('DownloadAllAsZip',null,'ad60af3d-e82b-4f47-9bc3-f5027165d7de',"+this.state.artifactDocSetId+",'"+fileName+"');";
     return (
     <div className="main-content">
 		  <div className="content-container"> 
