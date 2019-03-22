@@ -7,6 +7,8 @@ import {  UrlQueryParameterCollection } from '@microsoft/sp-core-library';
 import LogManager from '../../LogManager';
 import Moment from 'react-moment';
 import { ListItem } from '../../commonServices/ListItem';
+import * as jquery from 'jquery';
+
 
 
 // Interface representing the state of component details webpart
@@ -33,7 +35,8 @@ export interface ISpComponentDetailsState {
     "ComponentCategory":any,
     "ComponentSubCategory":any,
     "DownloadCount":any,
-    "DownloadAssociates": ""
+    "DownloadAssociates": "",
+    "ViewCount":any
   };
   // Hold current user details
   currentUser: {
@@ -50,6 +53,7 @@ export interface ISpComponentDetailsState {
   inventoryListId: string;
   id:string;
   artifactDocSetId:any;
+  artifactsDocLibId:string;
 }
 // React enabled component class implementing property and state interfaces
 export default class SpComponentDetails extends React.Component<ISpComponentDetailsProps, ISpComponentDetailsState> {
@@ -77,7 +81,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         "ComponentCategory":"",
         "ComponentSubCategory":"",
         "DownloadCount":0,
-        "DownloadAssociates": ""
+        "DownloadAssociates": "",
+        "ViewCount":0
       },
       currentUser: {
         "Id": 0,
@@ -89,8 +94,20 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
       componentOwnerDetails:[{"Title":"","Email":""}],
       inventoryListId:"",
       id:"",
-      artifactDocSetId:0
+      artifactDocSetId:0,
+      artifactsDocLibId:""
     };
+  }
+
+  // Move the comment content up based on the content height of component details left and rioght side of the webpart
+  public componentDidUpdate() {
+    console.log("Height diff:"+ (jquery(".rightContent").outerHeight()-jquery(".leftContent").outerHeight()).toString());
+    if(jquery(".rightContent").outerHeight()-jquery(".leftContent").outerHeight()>0){
+        jquery("#divComments").css("margin-top",jquery(".leftContent").outerHeight()-jquery(".rightContent").outerHeight())
+    }
+    else{
+      jquery("#divComments").css("margin-top",0)
+    }
   }
   // To store the component id coming from query string
   // Fetch the component details
@@ -110,10 +127,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     // Get the inventory list Id and put it into state
     this.getInventoryListId();
 
+     // Get the artifact docu lib Id and put it into state
+    this.getArtifactsDocLibId();
+
     // Get component id from query string
     var queryParameters = new UrlQueryParameterCollection(window.location.href);
     var id = queryParameters.getValue("ComponentID");
-    //id="39";
+   // id="39";
     console.log(id);
     this.setState({id: id});
     // Service call to fetch the component details by component id
@@ -136,7 +156,8 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         , "ComponentCategory/Title"
         , "ComponentSubCategory/Title"
         , "DownloadCount"
-        , "DownloadAssociates")
+        , "DownloadAssociates"
+        , "ViewCount")
       .get()
       .then((data: any) => {
          console.log(data);
@@ -150,6 +171,10 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
         if (data.LikesCount == null) {
           data.LikesCount = 0;
         }
+        if (data.ViewCount == null) {
+          data.ViewCount = 0;
+        }
+        reactHandler.setViewCount(data.ViewCount);
         data.ComponentDescriptionContent = { __html: data.ComponentDescription };
        // data.TechnologyStack = data.TechnologyStack;
         reactHandler.setState({
@@ -176,6 +201,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     // Assign returned files to state
                     artifacts: documents
                   });
+                  
                 })
                 .catch((error) => {
                   LogManager.logException(error
@@ -261,6 +287,23 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
          reactHandler.setState({
             // Set the list id to state object
             inventoryListId: l.Id
+          });
+        })
+        .catch((error) => {
+            LogManager.logException(error
+              , "Error occured while fetching component inventory list Id"
+              , "Component Details"
+              , "getInventoryListId");
+          });
+  }
+  // Get the inventory list id and put it into state
+  private getArtifactsDocLibId(){
+    let list = pnp.sp.web.lists.getByTitle(this.props.artifactsListName);
+    var reactHandler = this;
+      list.get().then(l => {
+         reactHandler.setState({
+            // Set the list id to state object
+            artifactsDocLibId: l.Id
           });
         })
         .catch((error) => {
@@ -411,6 +454,15 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     });
   };
 
+  public setViewCount = (viewCount:number): void => {
+    console.log("set view fired!")
+    //var viewCount = (this.state.item.ViewCount != null)?this.state.item.ViewCount:0
+    this.props.listService.setViewCount(this.props.inventoryListName, this.state.inventoryListId, Number(this.state.id), viewCount, this.state.currentUser.UserPrincipalName).then((result: any) => {
+      this.state.item.ViewCount = result;
+      this.setState({item:this.state.item});
+    });
+  };
+
   // Build and render the final markup to show on the page
   // simple-flexbox module is used to build row column design
   public render(): React.ReactElement<ISpComponentDetailsProps> {
@@ -418,7 +470,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
     //replace the character which are not allowed for file name as underscore(_)
    // fileName = fileName.replace('/[/\\?%*:|"<>]/g', '-');
 
-    var downloadHandler = "javascript:OfficeDevPnP.Core.RibbonManager.invokeCommand('DownloadAllAsZip',null,'ad60af3d-e82b-4f47-9bc3-f5027165d7de',"+this.state.artifactDocSetId+",'"+fileName+"');";
+    var downloadHandler = "javascript:OfficeDevPnP.Core.RibbonManager.invokeCommand('DownloadAllAsZip',null,'"+this.state.artifactsDocLibId+"',"+this.state.artifactDocSetId+",'"+fileName+"');";
     return (
     <div className="main-content">
 		  <div className="content-container"> 
@@ -452,6 +504,13 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                     {/*{this.state.item.Created.toLocaleDateString()}*/}
                     </label>
                 </div>
+                <span className="pipe">|</span>
+                <div className="lFloat">
+                  <label className="description">
+                    {this.state.item.ViewCount} {Number(this.state.item.ViewCount)>1?"Views":"View"}
+                    </label>					
+                </div>
+
                 {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?<span className="pipe">|</span>:""}
                 {(this.state.item.LikesCount!=null && Number(this.state.item.LikesCount)>0)?
                 <div className="lFloat">
@@ -581,7 +640,7 @@ export default class SpComponentDetails extends React.Component<ISpComponentDeta
                 {this.renderArtifacts()}
               </div>
             </div>            
-          </div><br /><br />
+          </div>
            </div>
         </div>           
       </div>

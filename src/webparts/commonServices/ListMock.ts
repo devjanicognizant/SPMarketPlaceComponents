@@ -90,79 +90,53 @@ export class ListMock implements IListServce {
         //     });
         // });
     }
-    public setDownload(listTitle:string, itemId:number, downloadAssociates:string, downloadCount:Number, currentUserId: any):any
-    {
-       // let listId:any = this.getListId(listTitle);
-       return new Promise<any>((resolve:any) => { 
-         let list = pnp.sp.web.lists.getByTitle(listTitle);
-        list.get().then((list) =>{
-            let listId:any = list.Id;
-            
-                let itemInformation=
-                { 
-                    DownloadAssociates: downloadAssociates,
-                    DownloadCount: downloadCount
-                };
-                if(downloadAssociates == undefined || downloadAssociates.indexOf(currentUserId) ==-1)
-                { 
-                    let newDownloadAssociates:string=downloadAssociates.trim()+" "+currentUserId;
-                    let newDownloadCount = newDownloadAssociates.trim().split(" ").length;
-                    itemInformation=
-                    { 
-                        DownloadAssociates: newDownloadAssociates,
-                        DownloadCount: newDownloadCount
-                    };
-                    this.updateListItem(listTitle,itemId,itemInformation);
-                    // var downloadObj;
-                    // if(localStorage["CognizantCDBMP.downloads"] === undefined){
-                    //     downloadObj = {"userID":currentUserId, "downloadID":[{"id":itemId.toString()}]};        
-                    // }
-                    // else{
-                    //     downloadObj = JSON.parse(localStorage["CognizantCDBMP.downloads"]);
-                    //     if(downloadObj.userID === currentUserId){
-                    //         downloadObj.downloadID.push({"id":itemId.toString()});
-                    //     }else{
-                    //         downloadObj = {"userID":currentUserId, "downloadID":[{"id":itemId.toString()}]};
-                    //     }
-                    // }
-            
-                    // localStorage["CognizantCDBMP.downloads"] = JSON.stringify(downloadObj);
-                    this.addToLocalStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.downloads", "downloadID","download");
-                }
-
-                resolve(itemInformation);
-            });
-         });
-    } 
-
-    public addToLocalStorage(itemId:string, listId: string, currentUserId: string, dictName: string, keyName:string, mode:string):void
+    
+    public addToStorage(itemId:string, listId: string, currentUserId: string, dictName: string, keyName:string, mode:string, storageType:string):void
     {
         var storageObj;
         var newRecord = false;
+        var data;
+        if(storageType === "local")
+        {
+            data = localStorage[dictName];
+        }
+        else
+        {
+            data = sessionStorage[dictName];
+        }
+        if(data !== undefined){
+            storageObj = JSON.parse(data);
+        }
         switch(mode)
         {
             case "download": 
-                if(localStorage[dictName] === undefined || localStorage[dictName].downloadID === undefined ){
+                if(data === undefined || storageObj.downloadID === undefined ){
                     storageObj = {"userID":currentUserId, "downloadID":[{"id":itemId, "list":listId}]}; 
                     newRecord = true;
                     break;
                 }
             case "favourite": 
-                if(localStorage[dictName] === undefined || localStorage[dictName].favID === undefined ){
+                if(data === undefined || storageObj.favID === undefined ){
                     storageObj = {"userID":currentUserId, "favID":[{"id":itemId, "list":listId}]};
                     newRecord = true;
                     break;
                 }
             case "like": 
-                if(localStorage[dictName] === undefined || localStorage[dictName].likeID === undefined ){
+                if(data === undefined || storageObj.likeID === undefined ){
                     storageObj = {"userID":currentUserId, "likeID":[{"id":itemId, "list":listId}]};
+                    newRecord = true;  
+                    break;
+                }
+            case "view": 
+                if(data === undefined || storageObj.vieweID === undefined ){
+                    storageObj = {"userID":currentUserId, "viewID":[{"id":itemId, "list":listId}]};
                     newRecord = true;  
                     break;
                 }
         }
         
         if(!newRecord){
-            storageObj = JSON.parse(localStorage[dictName]);
+            
             if(storageObj.userID === currentUserId){
                 switch(mode)
                 {
@@ -175,21 +149,34 @@ export class ListMock implements IListServce {
                     case "like": 
                         storageObj.likeID.push({"id":itemId, "list":listId});
                         break;
-                }
-                //storageObj.keyName.push({"id":itemId.toString(), "list":listId});
-               
+                    case "view": 
+                        storageObj.viewID.push({"id":itemId, "list":listId});
+                        break;
+                }               
             }
-            // else{
-            //     storageObj = {"userID":currentUserId, keyName:[{"id":itemId.toString(), "list":listId}]};
-            // }
         }
-    
-        localStorage[dictName] = JSON.stringify(storageObj);
+        if(storageType === "local")
+        {
+            localStorage[dictName] = JSON.stringify(storageObj);
+        }
+        else
+        {
+            sessionStorage[dictName] = JSON.stringify(storageObj);
+        }
 
     }
-    public removeFromLocalStorage(itemId:string, listId: string, currentUserId: string, dictName: string, keyName:string, mode: string):void
+    public removeFromStorage(itemId:string, listId: string, currentUserId: string, dictName: string, keyName:string, mode: string, storageType:string):void
     {
-        if(localStorage[dictName] !== undefined){
+        var data;
+        if(storageType === "local")
+        {
+            data = localStorage[dictName];
+        }
+        else
+        {
+            data = sessionStorage[dictName];
+        }
+        if(data !== undefined){
             var storageObj;
             storageObj = JSON.parse(localStorage[dictName]);
             if(storageObj.userID === currentUserId){
@@ -211,9 +198,15 @@ export class ListMock implements IListServce {
                         }
                         break;
                 }
-                //storageObj.keyName = storageObj.keyName.filter( a => (a.id != itemId.toString() && a.listId != listId));
             }
-            localStorage[dictName] = JSON.stringify(storageObj);
+            if(storageType === "local")
+            {
+                localStorage[dictName] = JSON.stringify(storageObj);
+            }
+            else
+            {
+                sessionStorage[dictName] = JSON.stringify(storageObj);
+            }
         }
     }
 
@@ -291,16 +284,64 @@ export class ListMock implements IListServce {
                 // }
                 // localStorage["CognizantCDBMP.favorites"] = JSON.stringify(favObj);
                 if(add){
-                    this.addToLocalStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.favorites", "favID","favourite");
+                    this.addToStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.favorites", "favID","favourite", "local");
                 }
                 if(remove && localStorage["CognizantCDBMP.favorites"] !== undefined){
-                    this.removeFromLocalStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.favorites", "favID","favourite");
+                    this.removeFromStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.favorites", "favID","favourite","local");
                 }
             
                 resolve(itemInformation);
             });
           });
     } 
-  }
+    public setDownload(listTitle:string, itemId:number, downloadAssociates:string, downloadCount:Number, currentUserId: any):any
+    {
+       // let listId:any = this.getListId(listTitle);
+       return new Promise<any>((resolve:any) => { 
+            let list = pnp.sp.web.lists.getByTitle(listTitle);
+            list.get().then((list) =>{
+                let listId:any = list.Id;
+                
+                let itemInformation=
+                { 
+                    DownloadAssociates: downloadAssociates,
+                    DownloadCount: downloadCount
+                };
+                if(downloadAssociates == undefined || downloadAssociates.indexOf(currentUserId) ==-1)
+                { 
+                    let newDownloadAssociates:string=downloadAssociates.trim()+" "+currentUserId;
+                    let newDownloadCount = newDownloadAssociates.trim().split(" ").length;
+                    itemInformation=
+                    { 
+                        DownloadAssociates: newDownloadAssociates,
+                        DownloadCount: newDownloadCount
+                    };
+                    this.updateListItem(listTitle,itemId,itemInformation);
+                    this.addToStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.downloads", "downloadID","download","local");
+                }
+
+                resolve(itemInformation);
+            });
+        });
+    } 
+    public setViewCount(listTitle:string,listId:string,itemId:number,viewCount:number, currentUserId: any):any
+    {
+        return new Promise<any>((resolve:any) => { 
+            if(sessionStorage["CognizantCDBMP.views"] === undefined || JSON.parse(sessionStorage["CognizantCDBMP.views"]).viewID === undefined 
+                || JSON.parse(sessionStorage["CognizantCDBMP.views"]).viewID.filter( a => (a.id == itemId.toString() && a.list == listId)).length==0){
+                viewCount++;
+                console.log(viewCount);
+                let itemInformation=
+                { 
+                    ViewCount: viewCount
+                };
+                this.updateListItem(listTitle,itemId,itemInformation);
+                this.addToStorage(itemId.toString(), listId , currentUserId, "CognizantCDBMP.views", "viewID","view","session");
+            }
+            resolve(viewCount);
+        });
+       
+    }
+ }
 
   
